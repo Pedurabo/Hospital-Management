@@ -1,0 +1,77 @@
+{% extends "base_dark.html" %}
+{% block title %}Pharmacist Prescriptions{% endblock %}
+
+{% block content %}
+<!-- Main content starts here -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fas fa-prescription-bottle-alt me-2"></i>Prescriptions</h4>
+        <button class="btn btn-success btn-sm" onclick="refreshTable()"><i class="fas fa-sync-alt me-1"></i>Refresh</button>
+    </div>
+                <div class="card-body">
+        <!-- Filters -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="statusFilter" class="form-label">Status</label>
+                <select id="statusFilter" class="form-select" onchange="filterByStatus()">
+                    <option value="">All</option>
+                        <option value="pending">Pending</option>
+                        <option value="dispensed">Dispensed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+            <div class="col-md-4">
+                <label for="dateFilter" class="form-label">Date</label>
+                <select id="dateFilter" class="form-select" onchange="filterByDate()">
+                    <option value="">All</option>
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                    </select>
+                </div>
+                </div>
+        <!-- Table -->
+        <div class="table-responsive">
+            <table id="prescriptionsTable" class="table table-dark table-striped table-hover align-middle">
+                <!-- Table head and body are rendered by Flask/Jinja as before -->
+                {{ prescriptions_table|safe }}
+            </table>
+                    </div>
+        <!-- Bulk action buttons -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+                <span id="selectedCount" class="badge bg-primary">0</span> selected
+            </div>
+            <div class="btn-group">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="bulkDispense()" id="bulkDispenseBtn" disabled>
+                                <i class="fas fa-pills me-1"></i>Bulk Dispense
+                            </button>
+                            <button type="button" class="btn btn-outline-warning btn-sm" onclick="bulkUpdateStatus()" id="bulkUpdateBtn" disabled>
+                                <i class="fas fa-edit me-1"></i>Update Status
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="bulkDelete()" id="bulkDeleteBtn" disabled>
+                                <i class="fas fa-trash me-1"></i>Bulk Delete <span class="badge bg-danger ms-1" id="bulkDeleteBadge" style="display: none;">0</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="exportSelected()" id="exportBtn" disabled>
+                                <i class="fas fa-download me-1"></i>Export Selected
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<!-- Modals (Bulk Delete, Bulk Update, Bulk Dispense) -->
+{{ bulk_modals|safe }}
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- DataTables, SweetAlert2, and custom JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<script>
+// All your previous JS code goes here, unchanged, but inside this block
+// ...
+</script>
+{% endblock %} 

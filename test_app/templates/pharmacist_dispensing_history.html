@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% block title %}Dispensing History - Pharmacist{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-history me-2"></i>Dispensing History
+        </h1>
+        <a href="{{ url_for('pharmacist_dashboard') }}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h4>{{ dispensing_history|length }}</h4>
+                    <p class="mb-0">Total Dispensings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h4>${{ "%.2f"|format(dispensing_history|sum(attribute='total_amount') if dispensing_history else 0) }}</h4>
+                    <p class="mb-0">Total Revenue</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h4>{{ dispensing_history|selectattr('dispensing_date', 'defined')|list|length }}</h4>
+                    <p class="mb-0">This Month</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <h4>{{ "%.2f"|format((dispensing_history|sum(attribute='total_amount') / dispensing_history|length) if dispensing_history else 0) }}</h4>
+                    <p class="mb-0">Average per Dispensing</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dispensing History Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Dispensing Records</h5>
+        </div>
+        <div class="card-body">
+            {% if dispensing_history %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Dispensing ID</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Prescription Date</th>
+                            <th>Dispensing Date</th>
+                            <th>Total Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dispensing in dispensing_history %}
+                        <tr>
+                            <td>
+                                <strong>#{{ dispensing.id }}</strong>
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>{{ dispensing.patient_name }}</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-phone"></i> {{ dispensing.phone_number }}
+                                    </small>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <strong>{{ dispensing.doctor_name }}</strong>
+                                </div>
+                            </td>
+                            <td>
+                                {{ dispensing.prescription_date.strftime('%Y-%m-%d') if dispensing.prescription_date else 'N/A' }}
+                                <br>
+                                <small class="text-muted">
+                                    {{ dispensing.prescription_date.strftime('%H:%M') if dispensing.prescription_date else '' }}
+                                </small>
+                            </td>
+                            <td>
+                                {{ dispensing.dispensing_date.strftime('%Y-%m-%d') if dispensing.dispensing_date else 'N/A' }}
+                                <br>
+                                <small class="text-muted">
+                                    {{ dispensing.dispensing_date.strftime('%H:%M') if dispensing.dispensing_date else '' }}
+                                </small>
+                            </td>
+                            <td>
+                                <strong>${{ "%.2f"|format(dispensing.total_amount) if dispensing.total_amount else '0.00' }}</strong>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                            onclick="viewDispensingDetails({{ dispensing.id }})" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-info" 
+                                            onclick="printDispensing({{ dispensing.id }})" title="Print">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle fa-3x mb-3"></i>
+                <h5>No Dispensing History</h5>
+                <p>You haven't dispensed any prescriptions yet.</p>
+                <a href="{{ url_for('pharmacist_prescriptions') }}" class="btn btn-primary">
+                    <i class="fas fa-prescription-bottle-medical me-1"></i>View Prescriptions
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Dispensing Details Modal -->
+<div class="modal fade" id="dispensingDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Dispensing Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="dispensingDetailsContent">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="printDispensingFromModal()">
+                    <i class="fas fa-print me-1"></i>Print
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentDispensingId = null;
+
+function viewDispensingDetails(dispensingId) {
+    currentDispensingId = dispensingId;
+    
+    // Show loading
+    document.getElementById('dispensingDetailsContent').innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading dispensing details...</p>
+        </div>
+    `;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('dispensingDetailsModal'));
+    modal.show();
+    
+    // Load dispensing details (this would need an API endpoint)
+    // For now, we'll show a placeholder
+    setTimeout(() => {
+        document.getElementById('dispensingDetailsContent').innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                Dispensing details for ID #${dispensingId} would be loaded here.
+                <br><br>
+                This would include:
+                <ul>
+                    <li>Patient information</li>
+                    <li>Prescription details</li>
+                    <li>Dispensed medications</li>
+                    <li>Batch numbers and expiry dates</li>
+                    <li>Pricing breakdown</li>
+                </ul>
+            </div>
+        `;
+    }, 1000);
+}
+
+function printDispensing(dispensingId) {
+    // This would open a print-friendly version of the dispensing record
+    alert(`Printing dispensing record #${dispensingId}`);
+    // In a real implementation, this would open a new window with a print-friendly template
+}
+
+function printDispensingFromModal() {
+    if (currentDispensingId) {
+        printDispensing(currentDispensingId);
+    }
+}
+
+// Add some interactivity to the table
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#f8f9fa';
+        });
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+});
+</script>
+{% endblock %} 

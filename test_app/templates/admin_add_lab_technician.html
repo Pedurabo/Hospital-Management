@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+{% block title %}Add Lab Technician - Admin Panel{% endblock %}
+
+{% block content %}
+<style>
+    /* Dark Mode Overrides */
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        color: #e2e8f0;
+    }
+
+    .card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border-bottom: 1px solid #334155;
+    }
+
+    .card-body {
+        background: #1e293b;
+        color: #e2e8f0;
+    }
+
+    .form-label {
+        color: #e2e8f0;
+        font-weight: 500;
+    }
+
+    .form-control {
+        background: #334155;
+        border: 2px solid #475569;
+        color: #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        background: #475569;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        color: #e2e8f0;
+    }
+
+    .form-control::placeholder {
+        color: #94a3b8;
+    }
+
+    .form-select {
+        background: #334155;
+        border: 2px solid #475569;
+        color: #e2e8f0;
+    }
+
+    .form-select:focus {
+        background: #475569;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        color: #e2e8f0;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #475569 0%, #334155 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(100, 116, 139, 0.4);
+    }
+
+    .alert {
+        background: #1e293b;
+        border: 1px solid #334155;
+        color: #e2e8f0;
+    }
+
+    .alert-success {
+        background: #065f46;
+        border-color: #047857;
+        color: #d1fae5;
+    }
+
+    .alert-danger {
+        background: #7f1d1d;
+        border-color: #dc2626;
+        color: #fecaca;
+    }
+
+    .text-muted {
+        color: #94a3b8 !important;
+    }
+
+    .text-light {
+        color: #e2e8f0 !important;
+    }
+
+    .required-field::after {
+        content: " *";
+        color: #ef4444;
+    }
+
+    .form-section {
+        background: #334155;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        color: #3b82f6;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #475569;
+        padding-bottom: 0.5rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-light">
+            <i class="fas fa-plus me-2"></i>Add New Lab Technician
+        </h1>
+        <a href="{{ url_for('admin_lab_technicians') }}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Back to Lab Technicians
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-user-plus me-2"></i>Lab Technician Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="addLabTechnicianForm">
+                        <!-- Personal Information Section -->
+                        <div class="form-section">
+                            <h6 class="section-title">
+                                <i class="fas fa-user me-2"></i>Personal Information
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="technician_name" class="form-label required-field">Full Name</label>
+                                    <input type="text" class="form-control" id="technician_name" name="technician_name" 
+                                           required placeholder="Enter full name">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="specialization" class="form-label required-field">Specialization</label>
+                                    <select class="form-select" id="specialization" name="specialization" required>
+                                        <option value="">Select specialization</option>
+                                        <option value="Senior Lab Technician">Senior Lab Technician</option>
+                                        <option value="Lab Technician">Lab Technician</option>
+                                        <option value="Lab Assistant">Lab Assistant</option>
+                                        <option value="Blood Bank Technician">Blood Bank Technician</option>
+                                        <option value="Microbiology Technician">Microbiology Technician</option>
+                                        <option value="Biochemistry Technician">Biochemistry Technician</option>
+                                        <option value="Hematology Technician">Hematology Technician</option>
+                                        <option value="Immunology Technician">Immunology Technician</option>
+                                        <option value="Molecular Biology Technician">Molecular Biology Technician</option>
+                                        <option value="Cytology Technician">Cytology Technician</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           placeholder="Enter email address">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone_number" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                           placeholder="Enter phone number">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Work Information Section -->
+                        <div class="form-section">
+                            <h6 class="section-title">
+                                <i class="fas fa-briefcase me-2"></i>Work Information
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="lab_location" class="form-label required-field">Lab Location</label>
+                                    <select class="form-select" id="lab_location" name="lab_location" required>
+                                        <option value="">Select lab location</option>
+                                        <option value="Lab A - Main Building">Lab A - Main Building</option>
+                                        <option value="Lab B - Main Building">Lab B - Main Building</option>
+                                        <option value="Lab C - Main Building">Lab C - Main Building</option>
+                                        <option value="Blood Bank - Ground Floor">Blood Bank - Ground Floor</option>
+                                        <option value="Microbiology Lab - 2nd Floor">Microbiology Lab - 2nd Floor</option>
+                                        <option value="Biochemistry Lab - 3rd Floor">Biochemistry Lab - 3rd Floor</option>
+                                        <option value="Hematology Lab - 3rd Floor">Hematology Lab - 3rd Floor</option>
+                                        <option value="Emergency Lab - ER">Emergency Lab - ER</option>
+                                        <option value="Outpatient Lab - OPD">Outpatient Lab - OPD</option>
+                                        <option value="Research Lab - Research Wing">Research Lab - Research Wing</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="available_days" class="form-label">Available Days</label>
+                                    <select class="form-select" id="available_days" name="available_days">
+                                        <option value="">Select available days</option>
+                                        <option value="Monday-Friday">Monday-Friday</option>
+                                        <option value="Monday-Saturday">Monday-Saturday</option>
+                                        <option value="Tuesday-Saturday">Tuesday-Saturday</option>
+                                        <option value="Wednesday-Sunday">Wednesday-Sunday</option>
+                                        <option value="Monday-Sunday">Monday-Sunday</option>
+                                        <option value="Weekends Only">Weekends Only</option>
+                                        <option value="Flexible">Flexible</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="available_hours" class="form-label">Available Hours</label>
+                                    <select class="form-select" id="available_hours" name="available_hours">
+                                        <option value="">Select available hours</option>
+                                        <option value="8:00 AM - 4:00 PM">8:00 AM - 4:00 PM</option>
+                                        <option value="9:00 AM - 5:00 PM">9:00 AM - 5:00 PM</option>
+                                        <option value="10:00 AM - 6:00 PM">10:00 AM - 6:00 PM</option>
+                                        <option value="7:00 AM - 3:00 PM">7:00 AM - 3:00 PM</option>
+                                        <option value="2:00 PM - 10:00 PM">2:00 PM - 10:00 PM</option>
+                                        <option value="10:00 PM - 6:00 AM">10:00 PM - 6:00 AM (Night Shift)</option>
+                                        <option value="Flexible">Flexible</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Information Section -->
+                        <div class="form-section">
+                            <h6 class="section-title">
+                                <i class="fas fa-key me-2"></i>Account Information
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="username" class="form-label required-field">Username</label>
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           required placeholder="Enter username">
+                                    <small class="text-muted">Username must be unique and will be used for login</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label required-field">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" 
+                                           required placeholder="Enter password">
+                                    <small class="text-muted">Minimum 6 characters</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('admin_lab_technicians') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Create Lab Technician
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation
+document.getElementById('addLabTechnicianForm').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const username = document.getElementById('username').value;
+    
+    if (password.length < 6) {
+        e.preventDefault();
+        alert('Password must be at least 6 characters long.');
+        return false;
+    }
+    
+    if (username.length < 3) {
+        e.preventDefault();
+        alert('Username must be at least 3 characters long.');
+        return false;
+    }
+    
+    // Show loading state
+    const submitBtn = document.querySelector('button[type="submit"]');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
+    submitBtn.disabled = true;
+});
+
+// Auto-hide alerts after 5 seconds
+setTimeout(function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close();
+    });
+}, 5000);
+</script>
+{% endblock %} 

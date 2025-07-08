@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Privileges - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-shield-alt"></i> Doctor Privileges</h1>
+    <p>Manage access permissions for doctor accounts</p>
+</div>
+
+<div class="content-body">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-md"></i> Privileges for {{ doctor_account.doctor_name }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Account Information</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Username:</strong></td>
+                                    <td>{{ doctor_account.username }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Specialization:</strong></td>
+                                    <td><span class="badge bg-info">{{ doctor_account.specialization }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td>
+                                        {% if doctor_account.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Contact Information</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Email:</strong></td>
+                                    <td>{{ doctor_account.email or 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Phone:</strong></td>
+                                    <td>{{ doctor_account.phone_number or 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Office:</strong></td>
+                                    <td>{{ doctor_account.office_location or 'N/A' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('admin_doctor_privileges', account_id=doctor_account.id) }}">
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3"><i class="fas fa-key"></i> Access Permissions</h6>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Note:</strong> Select the permissions you want to grant to this doctor. 
+                                    These permissions control what the doctor can access and modify in the system.
+                                </div>
+                            </div>
+                            
+                            <!-- Patient Management -->
+                            <div class="col-md-6">
+                                <div class="card border-primary">
+                                    <div class="card-header bg-primary text-white">
+                                        <h6 class="mb-0"><i class="fas fa-user-injured"></i> Patient Management</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="can_view_patients" 
+                                                   name="can_view_patients" 
+                                                   {% if doctor_account.can_view_patients %}checked{% endif %}>
+                                            <label class="form-check-label" for="can_view_patients">
+                                                <strong>View Patients</strong>
+                                                <br><small class="text-muted">Can view patient information and medical records</small>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="can_edit_patients" 
+                                                   name="can_edit_patients" 
+                                                   {% if doctor_account.can_edit_patients %}checked{% endif %}>
+                                            <label class="form-check-label" for="can_edit_patients">
+                                                <strong>Edit Patients</strong>
+                                                <br><small class="text-muted">Can update patient information and medical records</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Appointment Management -->
+                            <div class="col-md-6">
+                                <div class="card border-success">
+                                    <div class="card-header bg-success text-white">
+                                        <h6 class="mb-0"><i class="fas fa-calendar-check"></i> Appointment Management</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="can_view_appointments" 
+                                                   name="can_view_appointments" 
+                                                   {% if doctor_account.can_view_appointments %}checked{% endif %}>
+                                            <label class="form-check-label" for="can_view_appointments">
+                                                <strong>View Appointments</strong>
+                                                <br><small class="text-muted">Can view scheduled appointments and patient schedules</small>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="can_edit_appointments" 
+                                                   name="can_edit_appointments" 
+                                                   {% if doctor_account.can_edit_appointments %}checked{% endif %}>
+                                            <label class="form-check-label" for="can_edit_appointments">
+                                                <strong>Edit Appointments</strong>
+                                                <br><small class="text-muted">Can create, modify, and cancel appointments</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Reports and Analytics -->
+                            <div class="col-md-6">
+                                <div class="card border-info">
+                                    <div class="card-header bg-info text-white">
+                                        <h6 class="mb-0"><i class="fas fa-chart-bar"></i> Reports & Analytics</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="can_view_reports" 
+                                                   name="can_view_reports" 
+                                                   {% if doctor_account.can_view_reports %}checked{% endif %}>
+                                            <label class="form-check-label" for="can_view_reports">
+                                                <strong>View Reports</strong>
+                                                <br><small class="text-muted">Can access patient reports and medical analytics</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Profile Management -->
+                            <div class="col-md-6">
+                                <div class="card border-warning">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h6 class="mb-0"><i class="fas fa-user-cog"></i> Profile Management</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="can_manage_profile" 
+                                                   name="can_manage_profile" 
+                                                   {% if doctor_account.can_manage_profile %}checked{% endif %}>
+                                            <label class="form-check-label" for="can_manage_profile">
+                                                <strong>Manage Profile</strong>
+                                                <br><small class="text-muted">Can update their own profile information</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('admin_doctor_accounts') }}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Back to Doctor Accounts
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Update Privileges
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Privilege Information -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Privilege Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Default Doctor Privileges</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> View Patients (Required)</li>
+                                <li><i class="fas fa-check text-success"></i> View Appointments (Required)</li>
+                                <li><i class="fas fa-check text-success"></i> Manage Profile (Required)</li>
+                                <li><i class="fas fa-times text-muted"></i> Edit Patients (Optional)</li>
+                                <li><i class="fas fa-times text-muted"></i> Edit Appointments (Optional)</li>
+                                <li><i class="fas fa-times text-muted"></i> View Reports (Optional)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Security Notes</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-shield-alt text-info"></i> Privileges are enforced at the application level</li>
+                                <li><i class="fas fa-shield-alt text-info"></i> Changes take effect immediately</li>
+                                <li><i class="fas fa-shield-alt text-info"></i> Audit logs track privilege changes</li>
+                                <li><i class="fas fa-shield-alt text-info"></i> Inactive accounts have no access</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-check dependent permissions
+document.getElementById('can_edit_patients').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('can_view_patients').checked = true;
+    }
+});
+
+document.getElementById('can_edit_appointments').addEventListener('change', function() {
+    if (this.checked) {
+        document.getElementById('can_view_appointments').checked = true;
+    }
+});
+
+// Prevent unchecking view permissions if edit permissions are checked
+document.getElementById('can_view_patients').addEventListener('change', function() {
+    if (!this.checked && document.getElementById('can_edit_patients').checked) {
+        alert('Cannot disable "View Patients" while "Edit Patients" is enabled.');
+        this.checked = true;
+    }
+});
+
+document.getElementById('can_view_appointments').addEventListener('change', function() {
+    if (!this.checked && document.getElementById('can_edit_appointments').checked) {
+        alert('Cannot disable "View Appointments" while "Edit Appointments" is enabled.');
+        this.checked = true;
+    }
+});
+</script>
+{% endblock %} 

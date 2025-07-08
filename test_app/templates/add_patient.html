@@ -1,0 +1,274 @@
+{% extends "base_dark.html" %}
+
+{% block title %}Add Patient - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-user-plus"></i> Add New Patient</h1>
+    <p>Register a new patient in the healthcare system</p>
+</div>
+
+<div class="content-body">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Patient Registration Form</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('add_patient') }}" id="patientForm">
+                        <div class="row">
+                            <!-- Personal Information -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="fas fa-user"></i> Personal Information</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="patient_name" class="form-label">
+                                        <i class="fas fa-user"></i> Full Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="patient_name" name="patient_name" required>
+                                    <div class="form-text">Enter the patient's full name</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="age" class="form-label">
+                                        <i class="fas fa-birthday-cake"></i> Age <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="age" name="age" min="0" max="150" required>
+                                    <div class="form-text">Enter patient's age in years</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="sex" class="form-label">
+                                        <i class="fas fa-venus-mars"></i> Sex <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="sex" name="sex" required>
+                                        <option value="">Select sex</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <div class="form-text">Select patient's biological sex</div>
+                                </div>
+                            </div>
+
+                            <!-- Contact Information -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="fas fa-address-book"></i> Contact Information</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">
+                                        <i class="fas fa-envelope"></i> Email Address
+                                    </label>
+                                    <input type="email" class="form-control" id="email" name="email">
+                                    <div class="form-text">Enter patient's email address (optional)</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="phone_number" class="form-label">
+                                        <i class="fas fa-phone"></i> Phone Number
+                                    </label>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number">
+                                    <div class="form-text">Enter patient's phone number (optional)</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">
+                                        <i class="fas fa-map-marker-alt"></i> Address
+                                    </label>
+                                    <textarea class="form-control" id="address" name="address" rows="3"></textarea>
+                                    <div class="form-text">Enter patient's residential address (optional)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medical Information -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3"><i class="fas fa-heartbeat"></i> Medical Information</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="medical_history" class="form-label">
+                                        <i class="fas fa-notes-medical"></i> Medical History
+                                    </label>
+                                    <textarea class="form-control" id="medical_history" name="medical_history" rows="4" 
+                                              placeholder="Enter any relevant medical history, allergies, or conditions..."></textarea>
+                                    <div class="form-text">Document any relevant medical history or conditions</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="current_medications" class="form-label">
+                                        <i class="fas fa-pills"></i> Current Medications
+                                    </label>
+                                    <textarea class="form-control" id="current_medications" name="current_medications" rows="3"
+                                              placeholder="List any current medications the patient is taking..."></textarea>
+                                    <div class="form-text">List any medications the patient is currently taking</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Emergency Contact -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3"><i class="fas fa-exclamation-triangle"></i> Emergency Contact</h6>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="emergency_contact_name" class="form-label">
+                                                <i class="fas fa-user"></i> Emergency Contact Name
+                                            </label>
+                                            <input type="text" class="form-control" id="emergency_contact_name" name="emergency_contact_name">
+                                            <div class="form-text">Name of emergency contact person</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="emergency_contact_phone" class="form-label">
+                                                <i class="fas fa-phone"></i> Emergency Contact Phone
+                                            </label>
+                                            <input type="tel" class="form-control" id="emergency_contact_phone" name="emergency_contact_phone">
+                                            <div class="form-text">Phone number of emergency contact</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('patients') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left"></i> Back to Patients
+                                    </a>
+                                    <div>
+                                        <button type="reset" class="btn btn-outline-warning me-2">
+                                            <i class="fas fa-undo"></i> Reset Form
+                                        </button>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-save"></i> Register Patient
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Information -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Form Guidelines</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Required Fields</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> Full Name</li>
+                                <li><i class="fas fa-check text-success"></i> Age</li>
+                                <li><i class="fas fa-check text-success"></i> Sex</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Optional Fields</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-info text-info"></i> Email Address</li>
+                                <li><i class="fas fa-info text-info"></i> Phone Number</li>
+                                <li><i class="fas fa-info text-info"></i> Address</li>
+                                <li><i class="fas fa-info text-info"></i> Medical History</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation and enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('patientForm');
+    const ageInput = document.getElementById('age');
+    const phoneInput = document.getElementById('phone_number');
+    const emailInput = document.getElementById('email');
+
+    // Age validation
+    ageInput.addEventListener('input', function() {
+        const age = parseInt(this.value);
+        if (age < 0) {
+            this.setCustomValidity('Age cannot be negative');
+        } else if (age > 150) {
+            this.setCustomValidity('Age seems unrealistic');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Phone number formatting
+    phoneInput.addEventListener('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length > 0) {
+            if (value.length <= 3) {
+                value = `(${value}`;
+            } else if (value.length <= 6) {
+                value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+            } else {
+                value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
+            }
+        }
+        this.value = value;
+    });
+
+    // Email validation
+    emailInput.addEventListener('blur', function() {
+        if (this.value && !this.checkValidity()) {
+            this.setCustomValidity('Please enter a valid email address');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Form submission enhancement
+    form.addEventListener('submit', function(e) {
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+        }
+    });
+
+    // Real-time validation feedback
+    form.querySelectorAll('input, select, textarea').forEach(field => {
+        field.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+
+        field.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid') && this.value.trim()) {
+                this.classList.remove('is-invalid');
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,18 @@
+{% extends "base_dark.html" %}
+{% block title %}Pharmacist Profile{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex align-items-center">
+        <h4 class="mb-0"><i class="fas fa-user me-2"></i>Profile</h4>
+    </div>
+    <div class="card-body">
+        <!-- Profile form and info here -->
+        {{ profile_content|safe }}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Page-specific JS here -->
+{% endblock %} 

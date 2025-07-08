@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Diagnosis - Doctor Panel{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-stethoscope"></i> Patient Diagnosis</h1>
+    <p>Manage diagnosis records for {{ patient.patient_name }}</p>
+</div>
+
+<div class="content-body">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Patient Info Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-injured"></i> Patient Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Name:</strong> {{ patient.patient_name }}</p>
+                            <p><strong>Age:</strong> {{ patient.age }} years</p>
+                            <p><strong>Gender:</strong> {{ patient.sex }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Phone:</strong> {{ patient.phone_number or 'N/A' }}</p>
+                            <p><strong>Address:</strong> {{ patient.address or 'N/A' }}</p>
+                            <p><strong>Blood Group:</strong> {{ patient.blood_group or 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add New Diagnosis Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Add New Diagnosis</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="diagnosis" class="form-label">Diagnosis *</label>
+                                    <input type="text" class="form-control" id="diagnosis" name="diagnosis" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="date_diagnosed" class="form-label">Date Diagnosed *</label>
+                                    <input type="date" class="form-control" id="date_diagnosed" name="date_diagnosed" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="symptoms" class="form-label">Symptoms</label>
+                                    <textarea class="form-control" id="symptoms" name="symptoms" rows="3" placeholder="Describe patient symptoms..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="test_results" class="form-label">Test Results</label>
+                                    <textarea class="form-control" id="test_results" name="test_results" rows="3" placeholder="Lab test results, imaging findings..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Clinical Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="4" placeholder="Additional clinical observations, differential diagnosis, treatment plan..."></textarea>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('doctor_patients') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Patients
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Diagnosis
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Existing Diagnoses -->
+            {% if diagnoses %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Diagnosis History</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Diagnosis</th>
+                                    <th>Symptoms</th>
+                                    <th>Test Results</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for diagnosis in diagnoses %}
+                                <tr>
+                                    <td>{{ diagnosis.date_diagnosed.strftime('%Y-%m-%d') if diagnosis.date_diagnosed else 'N/A' }}</td>
+                                    <td><strong>{{ diagnosis.diagnosis }}</strong></td>
+                                    <td>{{ diagnosis.symptoms or 'N/A' }}</td>
+                                    <td>{{ diagnosis.test_results or 'N/A' }}</td>
+                                    <td>{{ diagnosis.notes or 'N/A' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Diagnosis Records</h5>
+                    <p class="text-muted">No diagnosis records found for this patient.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Set today's date as default for new diagnosis
+document.getElementById('date_diagnosed').value = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %} 

@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+{% block title %}Add New Drug{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-plus me-2"></i>Add New Drug
+        </h1>
+        <div>
+            <a href="{{ url_for('pharmacist_drugs') }}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i>Back to Drug Inventory
+            </a>
+        </div>
+    </div>
+
+    <!-- Add Drug Form -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Drug Information</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="addDrugForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="drug_name" class="form-label">Drug Name *</label>
+                                    <input type="text" class="form-control" id="drug_name" name="drug_name" required>
+                                    <div class="form-text">Enter the brand name of the drug</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="generic_name" class="form-label">Generic Name</label>
+                                    <input type="text" class="form-control" id="generic_name" name="generic_name">
+                                    <div class="form-text">Enter the generic name if available</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label for="drug_type" class="form-label">Drug Type</label>
+                                    <select class="form-control" id="drug_type" name="drug_type">
+                                        <option value="">Select Type</option>
+                                        <option value="Tablet">Tablet</option>
+                                        <option value="Capsule">Capsule</option>
+                                        <option value="Liquid">Liquid</option>
+                                        <option value="Injection">Injection</option>
+                                        <option value="Cream">Cream</option>
+                                        <option value="Ointment">Ointment</option>
+                                        <option value="Syrup">Syrup</option>
+                                        <option value="Drops">Drops</option>
+                                        <option value="Inhaler">Inhaler</option>
+                                        <option value="Suppository">Suppository</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label for="strength" class="form-label">Strength</label>
+                                    <input type="text" class="form-control" id="strength" name="strength" placeholder="e.g., 500">
+                                    <div class="form-text">Enter the strength value</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label for="unit" class="form-label">Unit</label>
+                                    <select class="form-control" id="unit" name="unit">
+                                        <option value="">Select Unit</option>
+                                        <option value="mg">mg</option>
+                                        <option value="g">g</option>
+                                        <option value="mcg">mcg</option>
+                                        <option value="ml">ml</option>
+                                        <option value="L">L</option>
+                                        <option value="IU">IU</option>
+                                        <option value="%">%</option>
+                                        <option value="units">units</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="manufacturer" class="form-label">Manufacturer</label>
+                                    <input type="text" class="form-control" id="manufacturer" name="manufacturer">
+                                    <div class="form-text">Enter the drug manufacturer</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="price" class="form-label">Price ($)</label>
+                                    <input type="number" class="form-control" id="price" name="price" step="0.01" min="0">
+                                    <div class="form-text">Enter the unit price</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="stock_quantity" class="form-label">Initial Stock Quantity</label>
+                                    <input type="number" class="form-control" id="stock_quantity" name="stock_quantity" min="0" value="0">
+                                    <div class="form-text">Enter the initial quantity in stock</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="reorder_level" class="form-label">Reorder Level</label>
+                                    <input type="number" class="form-control" id="reorder_level" name="reorder_level" min="0" value="10">
+                                    <div class="form-text">Minimum stock level before reordering</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter any additional information about the drug"></textarea>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="requires_prescription" name="requires_prescription" checked>
+                                <label class="form-check-label" for="requires_prescription">
+                                    Requires Prescription
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="history.back()">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Add Drug
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Drug Information Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-info-circle me-1"></i>Guidelines
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="font-weight-bold">Required Fields:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-1"></i>Drug Name</li>
+                            <li><i class="fas fa-check text-success me-1"></i>Drug Type</li>
+                            <li><i class="fas fa-check text-success me-1"></i>Price</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="font-weight-bold">Best Practices:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-lightbulb text-warning me-1"></i>Use generic names when possible</li>
+                            <li><i class="fas fa-lightbulb text-warning me-1"></i>Include strength and unit</li>
+                            <li><i class="fas fa-lightbulb text-warning me-1"></i>Set appropriate reorder levels</li>
+                            <li><i class="fas fa-lightbulb text-warning me-1"></i>Verify manufacturer information</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        <strong>Note:</strong> All drugs added will be immediately available for prescription dispensing.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Add Templates -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-magic me-1"></i>Quick Templates
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <button type="button" class="btn btn-outline-primary btn-sm w-100 mb-1" onclick="fillTemplate('antibiotic')">
+                            Antibiotic Template
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-sm w-100 mb-1" onclick="fillTemplate('painkiller')">
+                            Painkiller Template
+                        </button>
+                        <button type="button" class="btn btn-outline-warning btn-sm w-100 mb-1" onclick="fillTemplate('vitamin')">
+                            Vitamin Template
+                        </button>
+                    </div>
+                    <small class="text-muted">Click to pre-fill common drug information</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation
+document.getElementById('addDrugForm').addEventListener('submit', function(e) {
+    const drugName = document.getElementById('drug_name').value.trim();
+    const drugType = document.getElementById('drug_type').value;
+    const price = document.getElementById('price').value;
+    
+    if (!drugName) {
+        e.preventDefault();
+        alert('Please enter a drug name');
+        document.getElementById('drug_name').focus();
+        return false;
+    }
+    
+    if (!drugType) {
+        e.preventDefault();
+        alert('Please select a drug type');
+        document.getElementById('drug_type').focus();
+        return false;
+    }
+    
+    if (!price || price <= 0) {
+        e.preventDefault();
+        alert('Please enter a valid price');
+        document.getElementById('price').focus();
+        return false;
+    }
+});
+
+// Quick templates
+function fillTemplate(type) {
+    switch(type) {
+        case 'antibiotic':
+            document.getElementById('drug_name').value = 'Amoxicillin';
+            document.getElementById('generic_name').value = 'Amoxicillin';
+            document.getElementById('drug_type').value = 'Capsule';
+            document.getElementById('strength').value = '500';
+            document.getElementById('unit').value = 'mg';
+            document.getElementById('manufacturer').value = 'Generic Pharma';
+            document.getElementById('price').value = '15.99';
+            document.getElementById('stock_quantity').value = '100';
+            document.getElementById('reorder_level').value = '20';
+            document.getElementById('description').value = 'Broad-spectrum antibiotic for bacterial infections';
+            break;
+            
+        case 'painkiller':
+            document.getElementById('drug_name').value = 'Ibuprofen';
+            document.getElementById('generic_name').value = 'Ibuprofen';
+            document.getElementById('drug_type').value = 'Tablet';
+            document.getElementById('strength').value = '400';
+            document.getElementById('unit').value = 'mg';
+            document.getElementById('manufacturer').value = 'Generic Pharma';
+            document.getElementById('price').value = '8.99';
+            document.getElementById('stock_quantity').value = '200';
+            document.getElementById('reorder_level').value = '30';
+            document.getElementById('description').value = 'Non-steroidal anti-inflammatory drug for pain relief';
+            break;
+            
+        case 'vitamin':
+            document.getElementById('drug_name').value = 'Vitamin C';
+            document.getElementById('generic_name').value = 'Ascorbic Acid';
+            document.getElementById('drug_type').value = 'Tablet';
+            document.getElementById('strength').value = '1000';
+            document.getElementById('unit').value = 'mg';
+            document.getElementById('manufacturer').value = 'Health Supplements Inc';
+            document.getElementById('price').value = '12.99';
+            document.getElementById('stock_quantity').value = '150';
+            document.getElementById('reorder_level').value = '25';
+            document.getElementById('description').value = 'Vitamin C supplement for immune support';
+            document.getElementById('requires_prescription').checked = false;
+            break;
+    }
+}
+
+// Auto-format price input
+document.getElementById('price').addEventListener('input', function(e) {
+    let value = e.target.value;
+    if (value && !isNaN(value)) {
+        e.target.value = parseFloat(value).toFixed(2);
+    }
+});
+
+// Auto-format strength input
+document.getElementById('strength').addEventListener('input', function(e) {
+    let value = e.target.value;
+    if (value && !isNaN(value)) {
+        e.target.value = parseFloat(value);
+    }
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Follow-up - Doctor Panel{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-calendar-check"></i> Patient Follow-up</h1>
+    <p>Manage follow-up records for {{ patient.patient_name }}</p>
+</div>
+
+<div class="content-body">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Patient Info Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-injured"></i> Patient Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Name:</strong> {{ patient.patient_name }}</p>
+                            <p><strong>Age:</strong> {{ patient.age }} years</p>
+                            <p><strong>Gender:</strong> {{ patient.sex }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Phone:</strong> {{ patient.phone_number or 'N/A' }}</p>
+                            <p><strong>Address:</strong> {{ patient.address or 'N/A' }}</p>
+                            <p><strong>Blood Group:</strong> {{ patient.blood_group or 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add New Follow-up Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Add New Follow-up Record</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Appointment Details Section (if coming from appointment) -->
+                    {% if request.args.get('appointment_id') %}
+                    <div class="alert alert-info mb-4">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-calendar-alt me-2"></i>Related Appointment Details
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Appointment Date:</strong> {{ request.args.get('appointment_date') }}<br>
+                                <strong>Appointment Time:</strong> {{ request.args.get('appointment_time') }}<br>
+                                <strong>Appointment Type:</strong> {{ request.args.get('appointment_type') }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Reason:</strong> {{ request.args.get('reason') or 'N/A' }}<br>
+                                <strong>Appointment ID:</strong> #{{ request.args.get('appointment_id') }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="followup_date" class="form-label">Follow-up Date *</label>
+                                    <input type="date" class="form-control" id="followup_date" name="followup_date" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="treatment_response" class="form-label">Treatment Response</label>
+                                    <select class="form-control" id="treatment_response" name="treatment_response">
+                                        <option value="">Select response</option>
+                                        <option value="Excellent">Excellent</option>
+                                        <option value="Good">Good</option>
+                                        <option value="Fair">Fair</option>
+                                        <option value="Poor">Poor</option>
+                                        <option value="No response">No response</option>
+                                        <option value="Worsening">Worsening</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="next_appointment" class="form-label">Next Appointment</label>
+                                    <input type="date" class="form-control" id="next_appointment" name="next_appointment">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="progress_notes" class="form-label">Progress Notes</label>
+                                    <textarea class="form-control" id="progress_notes" name="progress_notes" rows="4" placeholder="Patient's progress, improvement, side effects..."></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="recommendations" class="form-label">Recommendations</label>
+                                    <textarea class="form-control" id="recommendations" name="recommendations" rows="3" placeholder="Treatment adjustments, lifestyle changes, referrals..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('doctor_patients') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Patients
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Follow-up
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Existing Follow-ups -->
+            {% if followups %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Follow-up History</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Treatment Response</th>
+                                    <th>Progress Notes</th>
+                                    <th>Next Appointment</th>
+                                    <th>Recommendations</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for followup in followups %}
+                                <tr>
+                                    <td>{{ followup.followup_date.strftime('%Y-%m-%d') if followup.followup_date else 'N/A' }}</td>
+                                    <td>
+                                        {% if followup.treatment_response %}
+                                            <span class="badge bg-{% if followup.treatment_response in ['Excellent', 'Good'] %}success{% elif followup.treatment_response == 'Fair' %}warning{% else %}danger{% endif %}">
+                                                {{ followup.treatment_response }}
+                                            </span>
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ followup.progress_notes or 'N/A' }}</td>
+                                    <td>{{ followup.next_appointment.strftime('%Y-%m-%d') if followup.next_appointment else 'N/A' }}</td>
+                                    <td>{{ followup.recommendations or 'N/A' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Follow-up Records</h5>
+                    <p class="text-muted">No follow-up records found for this patient.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Set today's date as default for new follow-up
+document.getElementById('followup_date').value = new Date().toISOString().split('T')[0];
+
+// Pre-fill form with appointment details if available
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const appointmentDate = urlParams.get('appointment_date');
+    const appointmentType = urlParams.get('appointment_type');
+    const reason = urlParams.get('reason');
+    
+    // Pre-fill followup date with appointment date if available
+    if (appointmentDate) {
+        document.getElementById('followup_date').value = appointmentDate;
+    }
+    
+    // Pre-fill progress notes with appointment details
+    if (appointmentType || reason) {
+        let progressNotes = '';
+        if (appointmentType) {
+            progressNotes += `Appointment Type: ${appointmentType}\n`;
+        }
+        if (reason) {
+            progressNotes += `Original Reason: ${reason}\n`;
+        }
+        progressNotes += '\nProgress Notes:\n';
+        document.getElementById('progress_notes').value = progressNotes;
+    }
+});
+</script>
+{% endblock %} 

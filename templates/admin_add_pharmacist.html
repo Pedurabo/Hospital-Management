@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Add New Pharmacist - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-plus-circle me-2"></i>Add New Pharmacist
+        </h1>
+        <a href="{{ url_for('admin_pharmacists') }}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Back to Pharmacists
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-md"></i> Pharmacist Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin_add_pharmacist') }}">
+                        <div class="row">
+                            <!-- Personal Information -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="fas fa-user"></i> Personal Information</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="pharmacist_name" class="form-label">Full Name *</label>
+                                    <input type="text" class="form-control" id="pharmacist_name" name="pharmacist_name" 
+                                           required placeholder="Enter full name">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="license_number" class="form-label">License Number *</label>
+                                    <input type="text" class="form-control" id="license_number" name="license_number" 
+                                           required placeholder="Enter license number">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="specialization" class="form-label">Specialization</label>
+                                    <select class="form-select" id="specialization" name="specialization">
+                                        <option value="">Select Specialization</option>
+                                        <option value="Clinical Pharmacy">Clinical Pharmacy</option>
+                                        <option value="Hospital Pharmacy">Hospital Pharmacy</option>
+                                        <option value="Community Pharmacy">Community Pharmacy</option>
+                                        <option value="Industrial Pharmacy">Industrial Pharmacy</option>
+                                        <option value="Nuclear Pharmacy">Nuclear Pharmacy</option>
+                                        <option value="Geriatric Pharmacy">Geriatric Pharmacy</option>
+                                        <option value="Pediatric Pharmacy">Pediatric Pharmacy</option>
+                                        <option value="Oncology Pharmacy">Oncology Pharmacy</option>
+                                        <option value="Psychiatric Pharmacy">Psychiatric Pharmacy</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Contact Information -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="fas fa-address-book"></i> Contact Information</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="phone_number" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                           placeholder="Enter phone number">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           placeholder="Enter email address">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="pharmacy_id" class="form-label">Assigned Pharmacy *</label>
+                                    <select class="form-select" id="pharmacy_id" name="pharmacy_id" required>
+                                        <option value="">Select Pharmacy</option>
+                                        {% for pharmacy in pharmacies %}
+                                            <option value="{{ pharmacy.id }}">{{ pharmacy.pharmacy_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Account Information -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3"><i class="fas fa-key"></i> Account Information</h6>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Note:</strong> This will create a login account for the pharmacist.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username *</label>
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           required placeholder="Enter username">
+                                    <div class="form-text">This will be used for login</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password *</label>
+                                    <input type="password" class="form-control" id="password" name="password" 
+                                           required placeholder="Enter password">
+                                    <div class="form-text">Minimum 6 characters</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('admin_pharmacists') }}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Add Pharmacist
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Information Card -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Important Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Required Fields</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> Full Name</li>
+                                <li><i class="fas fa-check text-success"></i> License Number</li>
+                                <li><i class="fas fa-check text-success"></i> Assigned Pharmacy</li>
+                                <li><i class="fas fa-check text-success"></i> Username</li>
+                                <li><i class="fas fa-check text-success"></i> Password</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Optional Fields</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-minus text-muted"></i> Specialization</li>
+                                <li><i class="fas fa-minus text-muted"></i> Phone Number</li>
+                                <li><i class="fas fa-minus text-muted"></i> Email Address</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const password = document.getElementById('password');
+    
+    form.addEventListener('submit', function(e) {
+        if (password.value.length < 6) {
+            e.preventDefault();
+            alert('Password must be at least 6 characters long.');
+            password.focus();
+        }
+    });
+    
+    // Auto-generate username from name
+    const nameInput = document.getElementById('pharmacist_name');
+    const usernameInput = document.getElementById('username');
+    
+    nameInput.addEventListener('blur', function() {
+        if (nameInput.value && !usernameInput.value) {
+            const name = nameInput.value.toLowerCase().replace(/[^a-z0-9]/g, '');
+            usernameInput.value = name;
+        }
+    });
+});
+</script>
+{% endblock %} 

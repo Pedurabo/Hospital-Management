@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Medical Record - {{ patient.patient_name }}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-file-medical"></i> Medical Record</h1>
+    <p>Complete medical history for {{ patient.patient_name }}</p>
+</div>
+
+<div class="content-body">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Patient Info Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-injured"></i> Patient Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p><strong>Name:</strong> {{ patient.patient_name }}</p>
+                            <p><strong>Age:</strong> {{ patient.age }} years</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Gender:</strong> {{ patient.sex }}</p>
+                            <p><strong>Blood Group:</strong> {{ patient.blood_group or 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Phone:</strong> {{ patient.phone_number or 'N/A' }}</p>
+                            <p><strong>Address:</strong> {{ patient.address or 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex flex-column">
+                                <a href="{{ url_for('doctor_patient_diagnosis', patient_id=patient.id) }}" class="btn btn-outline-primary btn-sm mb-2">
+                                    <i class="fas fa-stethoscope"></i> Add Diagnosis
+                                </a>
+                                <a href="{{ url_for('doctor_patient_prescription', patient_id=patient.id) }}" class="btn btn-outline-success btn-sm mb-2">
+                                    <i class="fas fa-pills"></i> Add Prescription
+                                </a>
+                                <a href="{{ url_for('doctor_patient_followup', patient_id=patient.id) }}" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-calendar-check"></i> Add Follow-up
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Records Tabs -->
+            <ul class="nav nav-tabs mb-4" id="medicalTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="diagnoses-tab" data-bs-toggle="tab" data-bs-target="#diagnoses" type="button" role="tab">
+                        <i class="fas fa-stethoscope"></i> Diagnoses ({{ diagnoses|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="prescriptions-tab" data-bs-toggle="tab" data-bs-target="#prescriptions" type="button" role="tab">
+                        <i class="fas fa-pills"></i> Prescriptions ({{ prescriptions|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="followups-tab" data-bs-toggle="tab" data-bs-target="#followups" type="button" role="tab">
+                        <i class="fas fa-calendar-check"></i> Follow-ups ({{ followups|length }})
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="medicalTabContent">
+                <!-- Diagnoses Tab -->
+                <div class="tab-pane fade show active" id="diagnoses" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-stethoscope"></i> Diagnosis History</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if diagnoses %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Diagnosis</th>
+                                            <th>Symptoms</th>
+                                            <th>Test Results</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for diagnosis in diagnoses %}
+                                        <tr>
+                                            <td>{{ diagnosis.date_diagnosed.strftime('%Y-%m-%d') if diagnosis.date_diagnosed else 'N/A' }}</td>
+                                            <td><strong>{{ diagnosis.diagnosis }}</strong></td>
+                                            <td>{{ diagnosis.symptoms or 'N/A' }}</td>
+                                            <td>{{ diagnosis.test_results or 'N/A' }}</td>
+                                            <td>{{ diagnosis.notes or 'N/A' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center">
+                                <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No Diagnosis Records</h5>
+                                <p class="text-muted">No diagnosis records found for this patient.</p>
+                                <a href="{{ url_for('doctor_patient_diagnosis', patient_id=patient.id) }}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Add First Diagnosis
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prescriptions Tab -->
+                <div class="tab-pane fade" id="prescriptions" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-pills"></i> Prescription History</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if prescriptions %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Medication</th>
+                                            <th>Dosage</th>
+                                            <th>Frequency</th>
+                                            <th>Duration</th>
+                                            <th>Instructions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for prescription in prescriptions %}
+                                        <tr>
+                                            <td>{{ prescription.prescribed_date.strftime('%Y-%m-%d') if prescription.prescribed_date else 'N/A' }}</td>
+                                            <td><strong>{{ prescription.medication_name }}</strong></td>
+                                            <td>{{ prescription.dosage }}</td>
+                                            <td>{{ prescription.frequency }}</td>
+                                            <td>{{ prescription.duration or 'N/A' }}</td>
+                                            <td>{{ prescription.instructions or 'N/A' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center">
+                                <i class="fas fa-pills fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No Prescription Records</h5>
+                                <p class="text-muted">No prescription records found for this patient.</p>
+                                <a href="{{ url_for('doctor_patient_prescription', patient_id=patient.id) }}" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> Add First Prescription
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Follow-ups Tab -->
+                <div class="tab-pane fade" id="followups" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Follow-up History</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if followups %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Treatment Response</th>
+                                            <th>Progress Notes</th>
+                                            <th>Next Appointment</th>
+                                            <th>Recommendations</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for followup in followups %}
+                                        <tr>
+                                            <td>{{ followup.followup_date.strftime('%Y-%m-%d') if followup.followup_date else 'N/A' }}</td>
+                                            <td>
+                                                {% if followup.treatment_response %}
+                                                    <span class="badge bg-{% if followup.treatment_response in ['Excellent', 'Good'] %}success{% elif followup.treatment_response == 'Fair' %}warning{% else %}danger{% endif %}">
+                                                        {{ followup.treatment_response }}
+                                                    </span>
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ followup.progress_notes or 'N/A' }}</td>
+                                            <td>{{ followup.next_appointment.strftime('%Y-%m-%d') if followup.next_appointment else 'N/A' }}</td>
+                                            <td>{{ followup.recommendations or 'N/A' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center">
+                                <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No Follow-up Records</h5>
+                                <p class="text-muted">No follow-up records found for this patient.</p>
+                                <a href="{{ url_for('doctor_patient_followup', patient_id=patient.id) }}" class="btn btn-info">
+                                    <i class="fas fa-plus"></i> Add First Follow-up
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <div class="text-center mt-4">
+                <a href="{{ url_for('doctor_patients') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Patients
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

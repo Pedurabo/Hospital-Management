@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Edit User - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-user-edit"></i> Edit User</h1>
+    <p>Modify user information and credentials</p>
+</div>
+
+<div class="content-body">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- User Info Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user"></i> User Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>User ID:</strong> <span class="badge bg-secondary">{{ user.id }}</span></p>
+                            <p><strong>Username:</strong> {{ user.username }}</p>
+                            <p><strong>Email:</strong> {{ user.email or 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Created:</strong> 
+                                {% if user.created_at %}
+                                    {% if user.created_at is string %}
+                                        {{ user.created_at }}
+                                    {% else %}
+                                        {{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                    {% endif %}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </p>
+                            <p><strong>Role:</strong> 
+                                {% if user.username == 'admin' %}
+                                    <span class="badge bg-danger"><i class="fas fa-shield-alt"></i> Administrator</span>
+                                {% else %}
+                                    <span class="badge bg-primary"><i class="fas fa-user"></i> Regular User</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-edit"></i> Edit User Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('update_user_route', user_id=user.id) }}" id="editUserForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user"></i> Username <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   value="{{ user.username }}" required>
+                            <div class="form-text">Enter the user's username</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i> Email Address
+                            </label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ user.email or '' }}">
+                            <div class="form-text">Enter the user's email address (optional)</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">
+                                <i class="fas fa-lock"></i> New Password
+                            </label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" 
+                                   minlength="6">
+                            <div class="form-text">Leave blank to keep current password (minimum 6 characters)</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">
+                                <i class="fas fa-lock"></i> Confirm New Password
+                            </label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                            <div class="form-text">Confirm the new password if changing</div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                            <div>
+                                <button type="reset" class="btn btn-outline-warning me-2">
+                                    <i class="fas fa-undo"></i> Reset Form
+                                </button>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Security Notice -->
+            {% if user.username == 'admin' %}
+            <div class="card mt-4">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Admin Account Notice</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">
+                        <i class="fas fa-shield-alt text-warning"></i>
+                        This is an administrator account. Changes to this account should be made with caution.
+                        The admin account cannot be deleted and has full system privileges.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation and enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editUserForm');
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('new_password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+
+    // Username validation
+    usernameInput.addEventListener('input', function() {
+        if (this.value.length < 3) {
+            this.setCustomValidity('Username must be at least 3 characters long');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Email validation
+    emailInput.addEventListener('blur', function() {
+        if (this.value && !this.checkValidity()) {
+            this.setCustomValidity('Please enter a valid email address');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Password validation
+    passwordInput.addEventListener('input', function() {
+        if (this.value.length > 0 && this.value.length < 6) {
+            this.setCustomValidity('Password must be at least 6 characters long');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Confirm password validation
+    confirmPasswordInput.addEventListener('input', function() {
+        if (passwordInput.value && this.value !== passwordInput.value) {
+            this.setCustomValidity('Passwords do not match');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+
+    // Form submission enhancement
+    form.addEventListener('submit', function(e) {
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+
+        // Check password confirmation
+        if (passwordInput.value && confirmPasswordInput.value !== passwordInput.value) {
+            confirmPasswordInput.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fill in all required fields and ensure passwords match.');
+        }
+    });
+
+    // Real-time validation feedback
+    form.querySelectorAll('input').forEach(field => {
+        field.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+
+        field.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid') && this.value.trim()) {
+                this.classList.remove('is-invalid');
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

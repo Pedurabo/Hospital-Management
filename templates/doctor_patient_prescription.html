@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Prescriptions - Doctor Panel{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-pills"></i> Patient Prescriptions</h1>
+    <p>Manage prescription records for {{ patient.patient_name }}</p>
+</div>
+
+<div class="content-body">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Patient Info Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-injured"></i> Patient Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Name:</strong> {{ patient.patient_name }}</p>
+                            <p><strong>Age:</strong> {{ patient.age }} years</p>
+                            <p><strong>Gender:</strong> {{ patient.sex }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Phone:</strong> {{ patient.phone_number or 'N/A' }}</p>
+                            <p><strong>Address:</strong> {{ patient.address or 'N/A' }}</p>
+                            <p><strong>Blood Group:</strong> {{ patient.blood_group or 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add New Prescription Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Add New Prescription</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="medication_name" class="form-label">Medication Name *</label>
+                                    <input type="text" class="form-control" id="medication_name" name="medication_name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="dosage" class="form-label">Dosage *</label>
+                                    <input type="text" class="form-control" id="dosage" name="dosage" placeholder="e.g., 500mg" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="frequency" class="form-label">Frequency *</label>
+                                    <select class="form-control" id="frequency" name="frequency" required>
+                                        <option value="">Select frequency</option>
+                                        <option value="Once daily">Once daily</option>
+                                        <option value="Twice daily">Twice daily</option>
+                                        <option value="Three times daily">Three times daily</option>
+                                        <option value="Four times daily">Four times daily</option>
+                                        <option value="As needed">As needed</option>
+                                        <option value="Before meals">Before meals</option>
+                                        <option value="After meals">After meals</option>
+                                        <option value="At bedtime">At bedtime</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="duration" class="form-label">Duration</label>
+                                    <input type="text" class="form-control" id="duration" name="duration" placeholder="e.g., 7 days, 2 weeks">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="prescribed_date" class="form-label">Date Prescribed *</label>
+                                    <input type="date" class="form-control" id="prescribed_date" name="prescribed_date" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="instructions" class="form-label">Special Instructions</label>
+                                    <textarea class="form-control" id="instructions" name="instructions" rows="3" placeholder="Special instructions, side effects to watch for..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('doctor_patients') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Patients
+                            </a>
+                            <div>
+                                <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-save"></i> Save Prescription
+                            </button>
+                                <button type="button" class="btn btn-success" onclick="saveAndSendToPharmacist()">
+                                    <i class="fas fa-paper-plane"></i> Save & Send to Pharmacist
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Existing Prescriptions -->
+            {% if prescriptions %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Prescription History</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Medication</th>
+                                    <th>Dosage</th>
+                                    <th>Frequency</th>
+                                    <th>Duration</th>
+                                    <th>Instructions</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prescription in prescriptions %}
+                                <tr>
+                                    <td>{{ prescription.prescribed_date.strftime('%Y-%m-%d') if prescription.prescribed_date else 'N/A' }}</td>
+                                    <td><strong>{{ prescription.medication_name }}</strong></td>
+                                    <td>{{ prescription.dosage }}</td>
+                                    <td>{{ prescription.frequency }}</td>
+                                    <td>{{ prescription.duration or 'N/A' }}</td>
+                                    <td>{{ prescription.instructions or 'N/A' }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" onclick="sendPrescriptionToPharmacist({{ patient.id }}, '{{ prescription.medication_name }}')" title="Send to Pharmacist">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-pills fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Prescription Records</h5>
+                    <p class="text-muted">No prescription records found for this patient.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Set today's date as default for new prescription
+document.getElementById('prescribed_date').value = new Date().toISOString().split('T')[0];
+
+function saveAndSendToPharmacist() {
+    // Get form data
+    const form = document.querySelector('form');
+    const formData = new FormData(form);
+    
+    // Validate required fields
+    const medicationName = formData.get('medication_name');
+    const dosage = formData.get('dosage');
+    const frequency = formData.get('frequency');
+    const prescribedDate = formData.get('prescribed_date');
+    
+    if (!medicationName || !dosage || !frequency || !prescribedDate) {
+        alert('Please fill in all required fields before sending to pharmacist.');
+        return;
+    }
+    
+    // Submit form to create and send prescription
+    fetch(`/create_and_send_prescription/{{ patient.id }}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Prescription saved and sent to pharmacist successfully!');
+            // Reload page to show updated prescription list
+            window.location.reload();
+        } else {
+            alert('Failed to save and send prescription: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while saving and sending prescription.');
+    });
+}
+
+function sendPrescriptionToPharmacist(patientId, medicationName) {
+    if (!confirm(`Send the prescription for ${medicationName} to the pharmacist?`)) return;
+    
+    fetch(`/send_prescription_to_pharmacist/${patientId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Prescription sent to pharmacist successfully!');
+        } else {
+            alert('Failed to send prescription: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while sending prescription.');
+    });
+}
+</script>
+{% endblock %} 

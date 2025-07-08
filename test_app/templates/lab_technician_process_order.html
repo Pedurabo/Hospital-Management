@@ -1,0 +1,183 @@
+{% extends "base_dark.html" %}
+
+{% block title %}Process Bloodwork Order{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-light mb-1">
+                        <i class="fas fa-flask me-2"></i>Process Bloodwork Order
+                    </h2>
+                    <p class="text-muted mb-0">Complete laboratory testing and generate detailed report</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('lab_technician_bloodwork_orders') }}" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Orders
+                    </a>
+                </div>
+            </div>
+
+            <!-- Order Information -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-header">
+                            <h5 class="mb-0 text-light">
+                                <i class="fas fa-info-circle me-2"></i>Order Details
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Order ID</label>
+                                <div class="text-light fw-bold">#{{ order.id }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Patient</label>
+                                <div class="text-light">{{ order.patient_name }}</div>
+                                <small class="text-muted">ID: {{ order.patient_id }} | Age: {{ order.age }} | {{ order.sex }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Doctor</label>
+                                <div class="text-light">Dr. {{ order.doctor_name }}</div>
+                                <small class="text-muted">{{ order.specialization }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Test Type</label>
+                                <div class="text-light">{{ order.test_type }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Priority</label>
+                                <div>
+                                    <span class="badge bg-{{ 'danger' if order.priority == 'urgent' else 'warning' }}">
+                                        {{ order.priority|title }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Order Date</label>
+                                <div class="text-light">{{ order.order_date.strftime('%B %d, %Y at %I:%M %p') if order.order_date else 'N/A' }}</div>
+                            </div>
+                            {% if order.notes %}
+                            <div class="mb-3">
+                                <label class="form-label text-muted">Doctor's Notes</label>
+                                <div class="text-light">{{ order.notes }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-header">
+                            <h5 class="mb-0 text-light">
+                                <i class="fas fa-microscope me-2"></i>Laboratory Results
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label for="test_results" class="form-label text-light">
+                                                <i class="fas fa-clipboard-list me-1"></i>Test Results *
+                                            </label>
+                                            <textarea class="form-control bg-dark text-light border-secondary" 
+                                                      id="test_results" 
+                                                      name="test_results" 
+                                                      rows="8" 
+                                                      placeholder="Enter detailed test results including all measurements, values, and observations..."
+                                                      required></textarea>
+                                            <div class="form-text text-muted">
+                                                Include all relevant measurements, reference ranges, and abnormal values
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label for="findings" class="form-label text-light">
+                                                <i class="fas fa-search me-1"></i>Clinical Findings
+                                            </label>
+                                            <textarea class="form-control bg-dark text-light border-secondary" 
+                                                      id="findings" 
+                                                      name="findings" 
+                                                      rows="4" 
+                                                      placeholder="Summarize key findings and clinical implications..."></textarea>
+                                            <div class="form-text text-muted">
+                                                Highlight significant findings and their clinical relevance
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label for="notes" class="form-label text-light">
+                                                <i class="fas fa-sticky-note me-1"></i>Additional Notes
+                                            </label>
+                                            <textarea class="form-control bg-dark text-light border-secondary" 
+                                                      id="notes" 
+                                                      name="notes" 
+                                                      rows="3" 
+                                                      placeholder="Any additional observations, recommendations, or special considerations..."></textarea>
+                                            <div class="form-text text-muted">
+                                                Include any special handling notes or recommendations for follow-up
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="alert alert-info bg-dark border-info">
+                                            <i class="fas fa-bell me-2"></i>
+                                            <strong>Important:</strong> Once you submit this form, a detailed report will be automatically generated and sent to Dr. {{ order.doctor_name }} for review and diagnosis.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('lab_technician_bloodwork_orders') }}" class="btn btn-outline-light">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-check me-1"></i>Complete & Send Report
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-resize textareas
+document.querySelectorAll('textarea').forEach(textarea => {
+    textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+    });
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const testResults = document.getElementById('test_results').value.trim();
+    if (!testResults) {
+        e.preventDefault();
+        alert('Test results are required to complete the order.');
+        document.getElementById('test_results').focus();
+    }
+});
+</script>
+{% endblock %} 

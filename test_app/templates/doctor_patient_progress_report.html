@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Progress Report - Doctor Dashboard{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-user-chart"></i> Patient Progress Report</h1>
+    <p>Comprehensive tracking of patient progress, treatment outcomes, and recovery timelines</p>
+</div>
+
+<div class="content-body">
+    <div class="row">
+        <div class="col-12">
+            <!-- Report Summary -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line"></i> Progress Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-primary">{{ patient_progress|length }}</h3>
+                                <p class="text-muted">Total Patients</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-success">{{ patient_progress|selectattr('progress_status', 'equalto', 'Active')|list|length }}</h3>
+                                <p class="text-muted">Active Patients</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-info">{{ patient_progress|selectattr('progress_status', 'equalto', 'New')|list|length }}</h3>
+                                <p class="text-muted">New Patients</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-warning">{{ patient_progress|sum(attribute='appointments_count') }}</h3>
+                                <p class="text-muted">Total Appointments</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient Progress Table -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-table"></i> Patient Progress Details</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary" onclick="exportToCSV()">
+                            <i class="fas fa-download"></i> Export CSV
+                        </button>
+                        <a href="{{ url_for('doctor_reports') }}" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Reports
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if patient_progress %}
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="progressTable">
+                            <thead>
+                                <tr>
+                                    <th>Patient Name</th>
+                                    <th>Age & Gender</th>
+                                    <th>Contact</th>
+                                    <th>Appointments</th>
+                                    <th>Last Visit</th>
+                                    <th>Progress Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for progress in patient_progress %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm me-3">
+                                                <div class="avatar-title bg-primary rounded-circle">
+                                                    <i class="fas fa-user text-white"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">{{ progress.patient.patient_name }}</h6>
+                                                <small class="text-muted">ID: {{ progress.patient.id }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>{{ progress.patient.age }} years</strong><br>
+                                            <span class="badge bg-info">{{ progress.patient.sex }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <i class="fas fa-phone me-1 text-muted"></i>
+                                            <a href="tel:{{ progress.patient.phone_number }}" class="text-decoration-none">
+                                                {{ progress.patient.phone_number }}
+                                            </a><br>
+                                            {% if progress.patient.email %}
+                                                <i class="fas fa-envelope me-1 text-muted"></i>
+                                                <a href="mailto:{{ progress.patient.email }}" class="text-decoration-none">
+                                                    {{ progress.patient.email }}
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-center">
+                                            <span class="badge bg-primary fs-6">{{ progress.appointments_count }}</span><br>
+                                            <small class="text-muted">appointments</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if progress.last_appointment %}
+                                            <div>
+                                                <strong>{{ progress.last_appointment.strftime('%Y-%m-%d') }}</strong><br>
+                                                <small class="text-muted">{{ progress.last_appointment.strftime('%H:%M') }}</small>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">No visits yet</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if progress.progress_status == 'Active' %}
+                                            <span class="badge bg-success">{{ progress.progress_status }}</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">{{ progress.progress_status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('doctor_patient_medical_record', patient_id=progress.patient.id) }}" 
+                                               class="btn btn-sm btn-primary" title="Medical Record">
+                                                <i class="fas fa-file-medical"></i>
+                                            </a>
+                                            <a href="{{ url_for('doctor_patient_diagnosis', patient_id=progress.patient.id) }}" 
+                                               class="btn btn-sm btn-warning" title="Add Diagnosis">
+                                                <i class="fas fa-stethoscope"></i>
+                                            </a>
+                                            <a href="{{ url_for('doctor_patient_prescription', patient_id=progress.patient.id) }}" 
+                                               class="btn btn-sm btn-success" title="Add Prescription">
+                                                <i class="fas fa-pills"></i>
+                                            </a>
+                                            <a href="{{ url_for('doctor_patient_followup', patient_id=progress.patient.id) }}" 
+                                               class="btn btn-sm btn-info" title="Add Follow-up">
+                                                <i class="fas fa-calendar-check"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-user-slash fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">No Patient Data Available</h4>
+                        <p class="text-muted">No patient progress data found. Patients will appear here once they have appointments.</p>
+                        <a href="{{ url_for('doctor_patients') }}" class="btn btn-primary">
+                            <i class="fas fa-users me-1"></i>View Patients
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function exportToCSV() {
+    // This would implement CSV export functionality
+    alert('CSV export feature coming soon!');
+}
+
+// Add search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.className = 'form-control mb-3';
+    searchInput.placeholder = 'Search patients...';
+    searchInput.id = 'searchInput';
+    
+    const table = document.getElementById('progressTable');
+    if (table) {
+        table.parentNode.insertBefore(searchInput, table);
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = table.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+    }
+});
+</script>
+
+<style>
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-title {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.btn-group .btn {
+    margin-right: 2px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+</style>
+{% endblock %} 

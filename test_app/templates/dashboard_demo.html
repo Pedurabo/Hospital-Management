@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Demo Mode{% endblock %}
+
+{% block content %}
+<div class="logo">🏠</div>
+<h2>Dashboard</h2>
+
+<div class="user-info">
+    <h3>Welcome, {{ username }}!</h3>
+    <p>You are successfully logged into the <strong>DEMO MODE</strong> system.</p>
+    <p><strong>Mode:</strong> Demo (No Database Required)</p>
+    <p><strong>Storage:</strong> In-Memory (Data resets when server restarts)</p>
+</div>
+
+<div>
+    <h3>Registered Users (Demo Data)</h3>
+    {% if users %}
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email or 'N/A' }}</td>
+                    <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') if user.created_at else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="color: #666; font-style: italic;">No users found in demo data.</p>
+    {% endif %}
+</div>
+
+<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; color: #856404;">
+    <strong>💡 Demo Mode Information:</strong><br>
+    • This is running in demo mode without a real database<br>
+    • All data is stored in memory and will reset when the server restarts<br>
+    • To use with a real SQL Server database, update the configuration in web_app.py<br>
+    • Default demo user: <code>admin</code> / <code>password</code>
+</div>
+
+<div class="links">
+    <a href="{{ url_for('logout') }}" class="btn logout-btn">Logout</a>
+</div>
+{% endblock %} 

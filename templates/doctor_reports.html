@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Analytics - Doctor Dashboard{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-chart-bar"></i> Reports & Analytics</h1>
+    <p>Comprehensive tracking and analysis of patient records, progress, diagnoses, and prescriptions</p>
+</div>
+
+<div class="content-body">
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Patients</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_patients }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Appointments</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_appointments }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Today's Appointments</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ today_appointments }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                This Week</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ week_appointments }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-week fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Categories -->
+    <div class="row">
+        <!-- Patient Progress Tracking -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-user-chart"></i> Patient Progress Tracking
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Track patient progress, appointment history, and treatment outcomes.</p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Patient progress monitoring</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Treatment response tracking</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Appointment attendance analysis</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Recovery timeline visualization</li>
+                    </ul>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('doctor_patient_progress_report') }}" class="btn btn-primary">
+                            <i class="fas fa-chart-line"></i> View Progress Report
+                        </a>
+                        <a href="{{ url_for('doctor_export_report', report_type='patient_progress') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-download"></i> Export
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnosis Summary -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">
+                        <i class="fas fa-stethoscope"></i> Diagnosis Summary
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Analyze diagnosis patterns, common conditions, and treatment effectiveness.</p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Diagnosis frequency analysis</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Common condition identification</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Treatment success rates</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Diagnosis trend analysis</li>
+                    </ul>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('doctor_diagnosis_summary_report') }}" class="btn btn-success">
+                            <i class="fas fa-chart-pie"></i> View Diagnosis Report
+                        </a>
+                        <a href="{{ url_for('doctor_export_report', report_type='diagnosis_summary') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-download"></i> Export
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prescription Analysis -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-info">
+                        <i class="fas fa-pills"></i> Prescription Analysis
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Monitor medication patterns, effectiveness, and prescription trends.</p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Medication usage patterns</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Prescription effectiveness</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Common medications analysis</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Side effect monitoring</li>
+                    </ul>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('doctor_prescription_analysis_report') }}" class="btn btn-info">
+                            <i class="fas fa-chart-bar"></i> View Prescription Report
+                        </a>
+                        <a href="{{ url_for('doctor_export_report', report_type='prescription_analysis') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-download"></i> Export
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appointment Analytics -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">
+                        <i class="fas fa-calendar-check"></i> Appointment Analytics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Analyze appointment patterns, patient attendance, and scheduling efficiency.</p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Appointment attendance rates</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Schedule optimization insights</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Patient engagement metrics</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Time management analysis</li>
+                    </ul>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('doctor_appointment_analytics_report') }}" class="btn btn-warning">
+                            <i class="fas fa-chart-area"></i> View Analytics Report
+                        </a>
+                        <a href="{{ url_for('doctor_export_report', report_type='appointment_analytics') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-download"></i> Export
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('doctor_patients') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-users"></i> View All Patients
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('doctor_appointments') }}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-calendar"></i> Manage Appointments
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-outline-warning w-100" onclick="generateComprehensiveReport()">
+                                <i class="fas fa-file-pdf"></i> Generate Full Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function generateComprehensiveReport() {
+    // This would generate a comprehensive PDF report
+    alert('Comprehensive report generation feature coming soon!');
+}
+</script>
+{% endblock %} 

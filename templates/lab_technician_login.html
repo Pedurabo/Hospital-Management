@@ -1,0 +1,172 @@
+{% extends "base_dark.html" %}
+{% block title %}Lab Technician Login{% endblock %}
+
+{% block content %}
+<style>
+    /* Dark Mode Overrides */
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        color: #e2e8f0;
+    }
+
+    .card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border-bottom: 1px solid #334155;
+    }
+
+    .card-body {
+        background: #1e293b;
+        color: #e2e8f0;
+    }
+
+    .form-label {
+        color: #e2e8f0;
+        font-weight: 500;
+    }
+
+    .form-control {
+        background: #334155;
+        border: 2px solid #475569;
+        color: #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        background: #475569;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        color: #e2e8f0;
+    }
+
+    .form-control::placeholder {
+        color: #94a3b8;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .alert {
+        background: #1e293b;
+        border: 1px solid #334155;
+        color: #e2e8f0;
+    }
+
+    .alert-success {
+        background: #065f46;
+        border-color: #047857;
+        color: #d1fae5;
+    }
+
+    .alert-danger {
+        background: #7f1d1d;
+        border-color: #dc2626;
+        color: #fecaca;
+    }
+
+    .text-muted {
+        color: #94a3b8 !important;
+    }
+
+    .text-light {
+        color: #e2e8f0 !important;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #1e293b;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #475569;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card mt-5">
+            <div class="card-header bg-primary text-white text-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-flask me-2"></i>Lab Technician Login
+                </h4>
+                <p class="mb-0 text-light">Access your laboratory management system</p>
+            </div>
+            <div class="card-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            <i class="fas fa-user me-2"></i>Username
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            <i class="fas fa-lock me-2"></i>Password
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </button>
+                    </div>
+                </form>
+
+                <hr class="my-4" style="border-color: #334155;">
+
+                <div class="text-center">
+                    <p class="text-muted mb-2">Need help?</p>
+                    <a href="#" class="text-primary text-decoration-none">
+                        <i class="fas fa-question-circle me-1"></i>Contact Administrator
+                    </a>
+                    <hr class="my-3" style="border-color: #334155;">
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Main Login
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <p class="text-muted">
+                <i class="fas fa-shield-alt me-1"></i>
+                Secure Laboratory Management System
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

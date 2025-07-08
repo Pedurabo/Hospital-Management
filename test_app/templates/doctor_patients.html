@@ -1,0 +1,327 @@
+{% extends "base_dark.html" %}
+
+{% block title %}My Patients - Doctor Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-users me-2"></i>My Patients
+        </h1>
+        <div>
+            <a href="{{ url_for('doctor_reports') }}" class="btn btn-info btn-sm me-2">
+                <i class="fas fa-chart-bar me-1"></i>Reports & Analytics
+            </a>
+            <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Patients</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ patients|length }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Active Patients</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ patients|selectattr('last_appointment', 'defined')|list|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Appointments</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ patients|sum(attribute='appointment_count') }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                New Patients</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ patients|selectattr('appointment_count', 'equalto', 1)|list|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patients Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Patient List</h6>
+        </div>
+        <div class="card-body">
+            {% if patients %}
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Age & Gender</th>
+                                <th>Contact Information</th>
+                                <th>Appointments</th>
+                                <th>Last Visit</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in patients %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-3">
+                                            <div class="avatar-title bg-primary rounded-circle">
+                                                <i class="fas fa-user text-white"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ patient.patient_name }}</h6>
+                                            <small class="text-muted">ID: {{ patient.id }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>{{ patient.age }} years</strong><br>
+                                        <span class="badge bg-info">{{ patient.sex }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <i class="fas fa-phone me-1 text-muted"></i>
+                                        <a href="tel:{{ patient.phone_number }}" class="text-decoration-none">
+                                            {{ patient.phone_number }}
+                                        </a><br>
+                                        {% if patient.email %}
+                                            <i class="fas fa-envelope me-1 text-muted"></i>
+                                            <a href="mailto:{{ patient.email }}" class="text-decoration-none">
+                                                {{ patient.email }}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-center">
+                                        <span class="badge bg-primary fs-6">{{ patient.appointment_count }}</span><br>
+                                        <small class="text-muted">appointments</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if patient.last_appointment %}
+                                        <div>
+                                            <strong>{{ patient.last_appointment.strftime('%Y-%m-%d') }}</strong><br>
+                                            <small class="text-muted">{{ patient.last_appointment.strftime('%H:%M') }}</small>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">No visits yet</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ url_for('doctor_patient_medical_record', patient_id=patient.id) }}" 
+                                           class="btn btn-sm btn-primary" title="Medical Record">
+                                            <i class="fas fa-file-medical"></i>
+                                        </a>
+                                        <a href="{{ url_for('doctor_patient_diagnosis', patient_id=patient.id) }}" 
+                                           class="btn btn-sm btn-warning" title="Add Diagnosis">
+                                            <i class="fas fa-stethoscope"></i>
+                                        </a>
+                                        <a href="{{ url_for('doctor_patient_prescription', patient_id=patient.id) }}" 
+                                           class="btn btn-sm btn-success" title="Add Prescription">
+                                            <i class="fas fa-pills"></i>
+                                        </a>
+                                        <a href="{{ url_for('doctor_patient_followup', patient_id=patient.id) }}" 
+                                           class="btn btn-sm btn-info" title="Add Follow-up">
+                                            <i class="fas fa-calendar-check"></i>
+                                        </a>
+                                        <a href="{{ url_for('doctor_appointments') }}?patient_id={{ patient.id }}" 
+                                           class="btn btn-sm btn-secondary" title="View Appointments">
+                                            <i class="fas fa-calendar"></i>
+                                        </a>
+                                        <a href="tel:{{ patient.phone_number }}" 
+                                           class="btn btn-sm btn-dark" title="Call Patient">
+                                            <i class="fas fa-phone"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-user-slash fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">No Patients Found</h4>
+                    <p class="text-muted">You don't have any patients assigned yet. Patients will appear here once they schedule appointments with you.</p>
+                    <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    {% if patients %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Search & Filter</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="searchInput" class="form-label">Search Patients</label>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search by name, phone, or email...">
+                </div>
+                <div class="col-md-3">
+                    <label for="ageFilter" class="form-label">Age Range</label>
+                    <select class="form-select" id="ageFilter">
+                        <option value="">All Ages</option>
+                        <option value="0-18">0-18 years</option>
+                        <option value="19-30">19-30 years</option>
+                        <option value="31-50">31-50 years</option>
+                        <option value="51-65">51-65 years</option>
+                        <option value="65+">65+ years</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="genderFilter" class="form-label">Gender</label>
+                    <select class="form-select" id="genderFilter">
+                        <option value="">All Genders</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary w-100" onclick="filterPatients()">
+                        <i class="fas fa-filter me-1"></i>Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-title {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.btn-group .btn {
+    margin-right: 2px;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+</style>
+
+<script>
+function filterPatients() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const ageFilter = document.getElementById('ageFilter').value;
+    const genderFilter = document.getElementById('genderFilter').value;
+    
+    const rows = document.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+        const name = row.cells[0].textContent.toLowerCase();
+        const ageText = row.cells[1].textContent;
+        const gender = row.cells[1].textContent.includes('Male') ? 'Male' : 'Female';
+        
+        let showRow = true;
+        
+        // Search filter
+        if (searchTerm && !name.includes(searchTerm)) {
+            showRow = false;
+        }
+        
+        // Age filter
+        if (ageFilter) {
+            const age = parseInt(ageText.match(/\d+/)[0]);
+            const [min, max] = ageFilter.split('-').map(x => x === '+' ? 999 : parseInt(x));
+            if (age < min || age > max) {
+                showRow = false;
+            }
+        }
+        
+        // Gender filter
+        if (genderFilter && gender !== genderFilter) {
+            showRow = false;
+        }
+        
+        row.style.display = showRow ? '' : 'none';
+    });
+}
+
+// Real-time search
+document.getElementById('searchInput').addEventListener('input', filterPatients);
+</script>
+{% endblock %} 

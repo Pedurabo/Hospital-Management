@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Create Doctor Account - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-user-plus me-2"></i>Create Doctor Account
+        </h1>
+        <a href="{{ url_for('admin_doctor_accounts') }}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Back to Doctor Accounts
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'error' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Create New Doctor Account</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username *</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                            <div class="form-text">Choose a unique username for the doctor to login.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password *</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                            <div class="form-text">Set a secure password for the doctor account.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                            <div class="form-text">Optional: Doctor's email address for notifications.</div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-1"></i>Important Information</h6>
+                            <ul class="mb-0">
+                                <li>This account will be linked to Doctor ID: <strong>{{ doctor_id }}</strong></li>
+                                <li>The doctor will be able to access their patient information and appointments</li>
+                                <li>Make sure the username is unique across all doctor accounts</li>
+                                <li>The password should be secure and shared securely with the doctor</li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin_doctor_accounts') }}" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Create Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const usernameField = document.getElementById('username');
+    const passwordField = document.getElementById('password');
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Username validation
+        if (!usernameField.value.trim()) {
+            usernameField.classList.add('is-invalid');
+            isValid = false;
+        } else if (usernameField.value.length < 3) {
+            usernameField.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            usernameField.classList.remove('is-invalid');
+        }
+        
+        // Password validation
+        if (!passwordField.value.trim()) {
+            passwordField.classList.add('is-invalid');
+            isValid = false;
+        } else if (passwordField.value.length < 6) {
+            passwordField.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            passwordField.classList.remove('is-invalid');
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fix the validation errors before submitting.');
+        }
+    });
+    
+    // Remove validation styling when user starts typing
+    [usernameField, passwordField].forEach(field => {
+        field.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+    });
+});
+</script>
+{% endblock %} 

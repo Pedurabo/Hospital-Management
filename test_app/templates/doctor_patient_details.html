@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Details - Doctor Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-user me-2"></i>Patient Details
+        </h1>
+        <div>
+            <a href="{{ url_for('doctor_patients') }}" class="btn btn-secondary btn-sm me-2">
+                <i class="fas fa-arrow-left me-1"></i>Back to Patients
+            </a>
+            <a href="{{ url_for('doctor_appointments') }}?patient_id={{ patient.id }}" class="btn btn-info btn-sm">
+                <i class="fas fa-calendar me-1"></i>View Appointments
+            </a>
+        </div>
+    </div>
+
+    <!-- Patient Information -->
+    <div class="row">
+        <!-- Basic Information -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Basic Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="avatar-lg mx-auto mb-3">
+                            <div class="avatar-title bg-primary rounded-circle">
+                                <i class="fas fa-user fa-3x text-white"></i>
+                            </div>
+                        </div>
+                        <h4>{{ patient.patient_name }}</h4>
+                        <p class="text-muted">Patient ID: {{ patient.id }}</p>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <strong>Age:</strong><br>
+                            <span class="text-muted">{{ patient.age }} years</span>
+                        </div>
+                        <div class="col-6">
+                            <strong>Gender:</strong><br>
+                            <span class="badge bg-info">{{ patient.sex }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Phone:</strong><br>
+                        <a href="tel:{{ patient.phone_number }}" class="text-decoration-none">
+                            <i class="fas fa-phone me-1"></i>{{ patient.phone_number }}
+                        </a>
+                    </div>
+                    
+                    {% if patient.email %}
+                    <div class="mb-3">
+                        <strong>Email:</strong><br>
+                        <a href="mailto:{{ patient.email }}" class="text-decoration-none">
+                            <i class="fas fa-envelope me-1"></i>{{ patient.email }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    {% if patient.address %}
+                    <div class="mb-3">
+                        <strong>Address:</strong><br>
+                        <span class="text-muted">{{ patient.address }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <strong>Registration Date:</strong><br>
+                        <span class="text-muted">{{ patient.created_at.strftime('%Y-%m-%d') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medical Information -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Medical Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <h6 class="font-weight-bold text-primary">
+                                    <i class="fas fa-history me-1"></i>Medical History
+                                </h6>
+                                {% if patient.medical_history %}
+                                    <div class="border rounded p-3 bg-light">
+                                        {{ patient.medical_history|replace('\n', '<br>')|safe }}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">No medical history recorded.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <h6 class="font-weight-bold text-primary">
+                                    <i class="fas fa-pills me-1"></i>Current Medications
+                                </h6>
+                                {% if patient.current_medications %}
+                                    <div class="border rounded p-3 bg-light">
+                                        {{ patient.current_medications|replace('\n', '<br>')|safe }}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">No current medications recorded.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <h6 class="font-weight-bold text-primary">
+                                    <i class="fas fa-user-friends me-1"></i>Emergency Contact
+                                </h6>
+                                {% if patient.emergency_contact_name %}
+                                    <div class="border rounded p-3 bg-light">
+                                        <strong>{{ patient.emergency_contact_name }}</strong><br>
+                                        {% if patient.emergency_contact_phone %}
+                                            <a href="tel:{{ patient.emergency_contact_phone }}" class="text-decoration-none">
+                                                <i class="fas fa-phone me-1"></i>{{ patient.emergency_contact_phone }}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">No emergency contact recorded.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <h6 class="font-weight-bold text-primary">
+                                    <i class="fas fa-calendar-check me-1"></i>Appointment Statistics
+                                </h6>
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <h4 class="text-primary">{{ medical_history|length }}</h4>
+                                            <small class="text-muted">Total Appointments</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <h4 class="text-success">
+                                                {{ medical_history|selectattr('status', 'equalto', 'completed')|list|length }}
+                                            </h4>
+                                            <small class="text-muted">Completed</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment History -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-calendar-alt me-1"></i>Appointment History
+            </h6>
+        </div>
+        <div class="card-body">
+            {% if medical_history %}
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Type</th>
+                                <th>Doctor</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in medical_history %}
+                            {% if appointment.appointment_date %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <strong>{{ appointment.appointment_date.strftime('%Y-%m-%d') }}</strong><br>
+                                        <span class="text-muted">{{ appointment.appointment_time.strftime('%H:%M') }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ appointment.appointment_type }}</span>
+                                </td>
+                                <td>
+                                    {% if appointment.doctor_name %}
+                                        <strong>{{ appointment.doctor_name }}</strong><br>
+                                        <small class="text-muted">{{ appointment.specialization }}</small>
+                                    {% else %}
+                                        <span class="text-muted">Not specified</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if appointment.reason %}
+                                        <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ appointment.reason }}">
+                                            {{ appointment.reason }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">No reason provided</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if appointment.status == 'scheduled' %}
+                                        <span class="badge bg-warning">Scheduled</span>
+                                    {% elif appointment.status == 'completed' %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% elif appointment.status == 'cancelled' %}
+                                        <span class="badge bg-danger">Cancelled</span>
+                                    {% elif appointment.status == 'no-show' %}
+                                        <span class="badge bg-secondary">No Show</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ appointment.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if appointment.notes %}
+                                        <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ appointment.notes }}">
+                                            {{ appointment.notes }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">No notes</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Appointment History</h5>
+                    <p class="text-muted">This patient hasn't had any appointments yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-2 mb-3">
+                    <a href="tel:{{ patient.phone_number }}" class="btn btn-success btn-block w-100">
+                        <i class="fas fa-phone me-2"></i>Call Patient
+                    </a>
+                </div>
+                <div class="col-md-2 mb-3">
+                    {% if patient.email %}
+                    <a href="mailto:{{ patient.email }}" class="btn btn-info btn-block w-100">
+                        <i class="fas fa-envelope me-2"></i>Send Email
+                    </a>
+                    {% else %}
+                    <button class="btn btn-info btn-block w-100" disabled>
+                        <i class="fas fa-envelope me-2"></i>No Email
+                    </button>
+                    {% endif %}
+                </div>
+                <div class="col-md-2 mb-3">
+                    <a href="{{ url_for('doctor_appointments') }}?patient_id={{ patient.id }}" class="btn btn-primary btn-block w-100">
+                        <i class="fas fa-calendar-plus me-2"></i>View Appointments
+                    </a>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <button class="btn btn-warning btn-block w-100" onclick="printPatientInfo()">
+                        <i class="fas fa-print me-2"></i>Print Info
+                    </button>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <a href="{{ url_for('doctor_patient_diagnosis', patient_id=patient.id) }}" class="btn btn-danger btn-block w-100">
+                        <i class="fas fa-stethoscope me-2"></i>Add Diagnosis
+                    </a>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <a href="{{ url_for('doctor_patient_prescription', patient_id=patient.id) }}" class="btn btn-secondary btn-block w-100">
+                        <i class="fas fa-pills me-2"></i>Add Prescription
+                    </a>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <a href="#" class="btn btn-dark btn-block w-100" onclick="sendPrescriptionToPharmacist({{ patient.id }})">
+                        <i class="fas fa-paper-plane me-2"></i>Send Prescription to Pharmacist
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-lg {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-title {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+</style>
+
+<script>
+function printPatientInfo() {
+    const printContent = `
+        <html>
+        <head>
+            <title>Patient Information - {{ patient.patient_name }}</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .header { text-align: center; margin-bottom: 30px; }
+                .section { margin-bottom: 20px; }
+                .section h3 { color: #4e73df; border-bottom: 2px solid #4e73df; padding-bottom: 5px; }
+                .info-row { margin-bottom: 10px; }
+                .label { font-weight: bold; }
+                table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f8f9fc; }
+                @media print { .no-print { display: none; } }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>Patient Information</h1>
+                <h2>{{ patient.patient_name }}</h2>
+                <p>Patient ID: {{ patient.id }} | Generated on: ${new Date().toLocaleDateString()}</p>
+            </div>
+            
+            <div class="section">
+                <h3>Basic Information</h3>
+                <div class="info-row"><span class="label">Name:</span> {{ patient.patient_name }}</div>
+                <div class="info-row"><span class="label">Age:</span> {{ patient.age }} years</div>
+                <div class="info-row"><span class="label">Gender:</span> {{ patient.sex }}</div>
+                <div class="info-row"><span class="label">Phone:</span> {{ patient.phone_number }}</div>
+                {% if patient.email %}<div class="info-row"><span class="label">Email:</span> {{ patient.email }}</div>{% endif %}
+                {% if patient.address %}<div class="info-row"><span class="label">Address:</span> {{ patient.address }}</div>{% endif %}
+            </div>
+            
+            <div class="section">
+                <h3>Medical Information</h3>
+                {% if patient.medical_history %}<div class="info-row"><span class="label">Medical History:</span> {{ patient.medical_history }}</div>{% endif %}
+                {% if patient.current_medications %}<div class="info-row"><span class="label">Current Medications:</span> {{ patient.current_medications }}</div>{% endif %}
+                {% if patient.emergency_contact_name %}<div class="info-row"><span class="label">Emergency Contact:</span> {{ patient.emergency_contact_name }} - {{ patient.emergency_contact_phone }}</div>{% endif %}
+            </div>
+            
+            <div class="section">
+                <h3>Appointment History</h3>
+                {% if medical_history %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Type</th>
+                            <th>Doctor</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in medical_history %}
+                        {% if appointment.appointment_date %}
+                        <tr>
+                            <td>{{ appointment.appointment_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ appointment.appointment_time.strftime('%H:%M') }}</td>
+                            <td>{{ appointment.appointment_type }}</td>
+                            <td>{{ appointment.doctor_name or 'Not specified' }}</td>
+                            <td>{{ appointment.status }}</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No appointment history available.</p>
+                {% endif %}
+            </div>
+        </body>
+        </html>
+    `;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+function sendPrescriptionToPharmacist(patientId) {
+    if (!confirm('Send the latest prescription for this patient to the pharmacist?')) return;
+    fetch(`/send_prescription_to_pharmacist/${patientId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Prescription sent to pharmacist successfully!');
+        } else {
+            alert('Failed to send prescription: ' + data.message);
+        }
+    })
+    .catch(() => alert('An error occurred while sending prescription.'));
+}
+</script>
+{% endblock %} 

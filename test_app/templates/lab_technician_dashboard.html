@@ -1,0 +1,416 @@
+{% extends "base_dark.html" %}
+{% block title %}Lab Technician Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    /* Dark Mode Overrides */
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        color: #e2e8f0;
+    }
+
+    .card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border-bottom: 1px solid #334155;
+    }
+
+    .card-body {
+        background: #1e293b;
+        color: #e2e8f0;
+    }
+
+    .table {
+        color: #e2e8f0;
+    }
+
+    .table thead th {
+        background: #334155;
+        border-color: #475569;
+        color: #e2e8f0;
+    }
+
+    .table tbody td {
+        border-color: #475569;
+        background: #1e293b;
+    }
+
+    .table tbody tr:hover {
+        background: #334155;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(5, 150, 105, 0.4);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-warning:hover {
+        background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(217, 119, 6, 0.4);
+    }
+
+    .alert {
+        background: #1e293b;
+        border: 1px solid #334155;
+        color: #e2e8f0;
+    }
+
+    .alert-success {
+        background: #065f46;
+        border-color: #047857;
+        color: #d1fae5;
+    }
+
+    .alert-danger {
+        background: #7f1d1d;
+        border-color: #dc2626;
+        color: #fecaca;
+    }
+
+    .text-muted {
+        color: #94a3b8 !important;
+    }
+
+    .text-light {
+        color: #e2e8f0 !important;
+    }
+
+    .badge {
+        font-size: 0.8em;
+    }
+
+    .badge-pending {
+        background: #d97706;
+        color: white;
+    }
+
+    .badge-completed {
+        background: #059669;
+        color: white;
+    }
+
+    .badge-urgent {
+        background: #dc2626;
+        color: white;
+    }
+
+    .stats-card {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border: 1px solid #475569;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .stats-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stats-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-label {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-light">
+            <i class="fas fa-flask me-2"></i>Laboratory Dashboard
+        </h1>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-sm me-2">
+                <i class="fas fa-home me-1"></i>Back to Home
+            </a>
+            <a href="{{ url_for('lab_technician_profile') }}" class="btn btn-outline-light btn-sm me-2">
+                <i class="fas fa-user me-1"></i>Profile
+            </a>
+            <a href="{{ url_for('lab_technician_logout') }}" class="btn btn-outline-danger btn-sm">
+                <i class="fas fa-sign-out-alt me-1"></i>Logout
+            </a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Welcome Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0 text-light">
+                <i class="fas fa-user-circle me-2"></i>Welcome, {{ lab_technician.technician_name }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Specialization:</strong> {{ lab_technician.specialization }}</p>
+                    <p class="mb-1"><strong>Lab Location:</strong> {{ lab_technician.lab_location }}</p>
+                    <p class="mb-1"><strong>Email:</strong> {{ lab_technician.email }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Phone:</strong> {{ lab_technician.phone_number }}</p>
+                    <p class="mb-1"><strong>Available Days:</strong> {{ lab_technician.available_days }}</p>
+                    <p class="mb-1"><strong>Available Hours:</strong> {{ lab_technician.available_hours }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card text-center">
+                <div class="stats-icon text-primary">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stats-number text-light">{{ pending_orders|length }}</div>
+                <div class="stats-label">Pending Orders</div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card text-center">
+                <div class="stats-icon text-success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-number text-light">{{ completed_orders|length }}</div>
+                <div class="stats-label">Completed Orders</div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card text-center">
+                <div class="stats-icon text-warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stats-number text-light">{{ pending_orders|selectattr('priority', 'equalto', 'urgent')|list|length }}</div>
+                <div class="stats-label">Urgent Orders</div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card text-center">
+                <div class="stats-icon text-info">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stats-number text-light">{{ (completed_orders|length / (pending_orders|length + completed_orders|length) * 100)|round(1) if (pending_orders|length + completed_orders|length) > 0 else 0 }}%</div>
+                <div class="stats-label">Completion Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('lab_technician_bloodwork_orders') }}" class="btn btn-primary w-100">
+                                <i class="fas fa-list me-2"></i>View All Orders
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('lab_technician_reports') }}" class="btn btn-success w-100">
+                                <i class="fas fa-file-medical me-2"></i>View Reports
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('lab_technician_profile') }}" class="btn btn-warning w-100">
+                                <i class="fas fa-cog me-2"></i>Update Profile
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="#" class="btn btn-info w-100" onclick="showHelp()">
+                                <i class="fas fa-question-circle me-2"></i>Help
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Orders -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-clock me-2"></i>Pending Bloodwork Orders
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_orders %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Patient</th>
+                                        <th>Test Type</th>
+                                        <th>Priority</th>
+                                        <th>Order Date</th>
+                                        <th>Doctor</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in pending_orders %}
+                                    <tr>
+                                        <td>#{{ order.id }}</td>
+                                        <td>{{ order.patient_name }}</td>
+                                        <td>{{ order.test_type }}</td>
+                                        <td>
+                                            <span class="badge badge-{{ 'urgent' if order.priority == 'urgent' else 'pending' }}">
+                                                {{ order.priority|title }}
+                                            </span>
+                                        </td>
+                                        <td>{{ order.order_date.strftime('%Y-%m-%d') if order.order_date else 'N/A' }}</td>
+                                        <td>{{ order.doctor_name }}</td>
+                                        <td>
+                                            <a href="{{ url_for('lab_technician_process_order', order_id=order.id) }}" 
+                                               class="btn btn-primary btn-sm">
+                                                <i class="fas fa-flask me-1"></i>Process
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle text-success" style="font-size: 3rem;"></i>
+                            <h5 class="mt-3 text-light">No Pending Orders</h5>
+                            <p class="text-muted">All bloodwork orders have been processed!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Completed Orders -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-check-circle me-2"></i>Recently Completed Orders
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if completed_orders %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Patient</th>
+                                        <th>Test Type</th>
+                                        <th>Completion Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in completed_orders[:5] %}
+                                    <tr>
+                                        <td>#{{ order.id }}</td>
+                                        <td>{{ order.patient_name }}</td>
+                                        <td>{{ order.test_type }}</td>
+                                        <td>{{ order.completion_date.strftime('%Y-%m-%d') if order.completion_date else 'N/A' }}</td>
+                                        <td>
+                                            <span class="badge badge-completed">Completed</span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('lab_technician_view_report', report_id=order.report_id) }}" 
+                                               class="btn btn-success btn-sm">
+                                                <i class="fas fa-eye me-1"></i>View Report
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-file-medical text-muted" style="font-size: 3rem;"></i>
+                            <h5 class="mt-3 text-light">No Completed Orders</h5>
+                            <p class="text-muted">Start processing bloodwork orders to see completed reports here.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showHelp() {
+    alert('Laboratory Management System Help:\n\n' +
+          '1. View All Orders: See all bloodwork orders\n' +
+          '2. Process Orders: Complete bloodwork tests and generate reports\n' +
+          '3. View Reports: Access completed lab reports\n' +
+          '4. Update Profile: Modify your contact information\n\n' +
+          'For additional support, contact your administrator.');
+}
+</script>
+{% endblock %} 

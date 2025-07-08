@@ -1,0 +1,333 @@
+{% extends "base_dark.html" %}
+
+{% block title %}Patient Login - Hospital Management System{% endblock %}
+
+{% block content %}
+<style>
+    /* Dark Mode Overrides */
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        color: #e2e8f0;
+    }
+
+    .card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border-bottom: 1px solid #334155;
+    }
+
+    .card-body {
+        background: #1e293b;
+        color: #e2e8f0;
+    }
+
+    .form-label {
+        color: #e2e8f0;
+        font-weight: 500;
+    }
+
+    .form-control {
+        background: #334155;
+        border: 2px solid #475569;
+        color: #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        background: #475569;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        color: #ffffff;
+    }
+
+    .form-control::placeholder {
+        color: #94a3b8;
+    }
+
+    .input-group-text {
+        background: #475569;
+        border: 2px solid #475569;
+        color: #e2e8f0;
+    }
+
+    .btn-outline-secondary {
+        background: #475569;
+        border-color: #475569;
+        color: #e2e8f0;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #64748b;
+        border-color: #64748b;
+        color: #ffffff;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border: none;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-outline-light {
+        background: transparent;
+        border: 2px solid #e2e8f0;
+        color: #e2e8f0;
+    }
+
+    .btn-outline-light:hover {
+        background: #e2e8f0;
+        border-color: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .text-muted {
+        color: #94a3b8 !important;
+    }
+
+    hr {
+        border-color: #475569;
+    }
+
+    /* Alert Styles for Dark Mode */
+    .alert-success {
+        background: #065f46;
+        color: #d1fae5;
+        border: 1px solid #047857;
+    }
+
+    .alert-danger {
+        background: #991b1b;
+        color: #fee2e2;
+        border: 1px solid #dc2626;
+    }
+
+    .alert-info {
+        background: #1e40af;
+        color: #dbeafe;
+        border: 1px solid #2563eb;
+    }
+
+    .alert-warning {
+        background: #92400e;
+        color: #fef3c7;
+        border: 1px solid #d97706;
+    }
+
+    /* Enhanced animations for dark mode */
+    .card {
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Glow effect on focus */
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25), 0 0 20px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Loading animation for dark mode */
+    .loading {
+        border: 3px solid rgba(255,255,255,.2);
+        border-top-color: #ffffff;
+    }
+
+    /* Custom scrollbar for dark mode */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #1e293b;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #475569;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #64748b;
+    }
+
+    /* Patient-specific styling */
+    .patient-icon {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+    }
+
+    .login-links a {
+        transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        display: inline-block;
+        margin: 0.25rem;
+    }
+
+    .login-links a:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+        text-decoration: none !important;
+    }
+</style>
+
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="row w-100 justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    <div class="patient-icon">
+                        <i class="fas fa-user-injured fa-2x"></i>
+                    </div>
+                    <h2 class="text-white mb-2">Patient Login</h2>
+                    <p class="text-light opacity-75">Access your medical records</p>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+                                    {{ message }}
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('patient_login') }}" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user me-2"></i>Username
+                            </label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
+                            <div class="invalid-feedback">
+                                Please enter your username.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter your password.
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3" id="loginBtn">
+                            <span class="btn-text">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </span>
+                            <span class="btn-loading d-none">
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                Logging in...
+                            </span>
+                        </button>
+                    </form>
+
+                    <div class="text-center">
+                        <div class="login-links">
+                            <p class="mb-2">
+                                <a href="{{ url_for('patient_register') }}" class="text-light text-decoration-none">
+                                    <i class="fas fa-user-plus me-1"></i>New Patient? Register here
+                                </a>
+                            </p>
+                            <p class="mb-2">
+                                <a href="{{ url_for('index') }}" class="text-light text-decoration-none">
+                                    <i class="fas fa-home me-1"></i>Back to Home
+                                </a>
+                            </p>
+                            <p class="mb-2">
+                                <a href="{{ url_for('login') }}" class="text-light text-decoration-none">
+                                    <i class="fas fa-user-md me-1"></i>Admin Login
+                                </a>
+                            </p>
+                            <p class="mb-0">
+                                <a href="{{ url_for('doctor_login') }}" class="text-light text-decoration-none">
+                                    <i class="fas fa-stethoscope me-1"></i>Doctor Login
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password toggle
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function() {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        } else {
+            // Show loading state
+            const btnText = document.querySelector('.btn-text');
+            const btnLoading = document.querySelector('.btn-loading');
+            btnText.classList.add('d-none');
+            btnLoading.classList.remove('d-none');
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+});
+</script>
+{% endblock %} 

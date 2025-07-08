@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Kents International Hospital{% endblock %}</title>
+    
+    <!-- Bootstrap 5 with Darkly Theme -->
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/darkly/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts - Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    {% block styles %}
+    <!-- Sharp, Crisp CSS without Blur Effects -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --danger-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-accent: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            font-smooth: never;
+            -webkit-font-smoothing: none;
+        }
+
+        /* Sharp Background Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(245, 87, 108, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(79, 172, 254, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* Sharp Navbar */
+        .navbar {
+            background: #1e293b !important;
+            border-bottom: 2px solid var(--border-accent);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-link {
+            position: relative;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 4px;
+            color: var(--text-primary) !important;
+        }
+
+        .nav-link:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+            color: var(--border-accent) !important;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+        }
+
+        /* Sharp Cards */
+        .card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+            border-color: var(--border-accent);
+        }
+
+        .card-header {
+            background: var(--primary-gradient) !important;
+            border-bottom: 2px solid var(--card-border);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .card:hover .card-header::before {
+            left: 100%;
+        }
+
+        .card-body {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        /* Sharp Buttons */
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border-color: var(--border-accent);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            border-color: #10b981;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--danger-gradient);
+            border-color: #ef4444;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-warning {
+            background: var(--warning-gradient);
+            border-color: #f59e0b;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-outline-light {
+            background: transparent;
+            border: 2px solid var(--text-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn-outline-light:hover {
+            background: var(--text-secondary);
+            color: var(--dark-bg);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-danger {
+            background: transparent;
+            border: 2px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .btn-outline-danger:hover {
+            background: #ef4444;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Sharp Form Controls */
+        .form-control {
+            background: #334155;
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: #475569;
+            border-color: var(--border-accent);
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+            color: var(--text-primary);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Sharp Tables */
+        .table {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background: var(--primary-gradient);
+            color: white;
+            font-weight: 600;
+            border-bottom: 2px solid var(--card-border);
+            padding: 1rem;
+        }
+
+        .table td {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* Sharp Alerts */
+        .alert {
+            border: 2px solid;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        /* Sharp Badges */
+        .badge {
+            border-radius: 6px;
+            font-weight: 600;
+            padding: 0.5rem 0.75rem;
+        }
+
+        /* Sharp Modal */
+        .modal-content {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 12px;
+        }
+
+        .modal-header {
+            background: var(--primary-gradient);
+            border-bottom: 2px solid var(--card-border);
+            color: white;
+        }
+
+        .modal-body {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .modal-footer {
+            background: var(--card-bg);
+            border-top: 2px solid var(--card-border);
+        }
+
+        /* Sharp Dropdown */
+        .dropdown-menu {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown-item {
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--border-accent);
+        }
+
+        /* Sharp Pagination */
+        .page-link {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .page-link:hover {
+            background: var(--border-accent);
+            border-color: var(--border-accent);
+            color: white;
+        }
+
+        .page-item.active .page-link {
+            background: var(--primary-gradient);
+            border-color: var(--border-accent);
+        }
+
+        /* Sharp Progress Bars */
+        .progress {
+            background: #334155;
+            border-radius: 8px;
+            border: 2px solid var(--card-border);
+        }
+
+        .progress-bar {
+            background: var(--primary-gradient);
+            border-radius: 6px;
+        }
+
+        /* Sharp List Groups */
+        .list-group-item {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .list-group-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--border-accent);
+        }
+
+        /* Sharp Accordion */
+        .accordion-item {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+        }
+
+        .accordion-button {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 6px;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .accordion-body {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        /* Sharp Navigation Pills */
+        .nav-pills .nav-link {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            color: var(--text-primary);
+            border-radius: 8px;
+            margin: 0.25rem;
+        }
+
+        .nav-pills .nav-link.active {
+            background: var(--primary-gradient);
+            border-color: var(--border-accent);
+            color: white;
+        }
+
+        /* Sharp Tooltips */
+        .tooltip-inner {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            color: var(--text-primary);
+            border-radius: 8px;
+        }
+
+        /* Sharp Popovers */
+        .popover {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+        }
+
+        .popover-header {
+            background: var(--primary-gradient);
+            color: white;
+            border-bottom: 2px solid var(--card-border);
+        }
+
+        .popover-body {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        /* Sharp Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--card-bg);
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-accent);
+            border-radius: 6px;
+            border: 2px solid var(--card-bg);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        /* Sharp Focus States */
+        *:focus {
+            outline: 2px solid var(--border-accent);
+            outline-offset: 2px;
+        }
+
+        /* Sharp Text Selection */
+        ::selection {
+            background: var(--border-accent);
+            color: white;
+        }
+
+        /* Sharp Loading Spinner */
+        .spinner-border {
+            border: 3px solid var(--card-border);
+            border-top: 3px solid var(--border-accent);
+        }
+
+        /* Sharp Container */
+        .container, .container-fluid {
+            padding: 2rem 1rem;
+        }
+
+        /* Sharp Row and Col */
+        .row {
+            margin: 0 -0.5rem;
+        }
+
+        .col, .col-md-6, .col-md-4, .col-md-8, .col-12 {
+            padding: 0 0.5rem;
+        }
+
+        /* Sharp Utilities */
+        .text-light {
+            color: var(--text-primary) !important;
+        }
+
+        .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        .bg-dark {
+            background: var(--card-bg) !important;
+        }
+
+        .border {
+            border: 2px solid var(--card-border) !important;
+        }
+
+        .rounded {
+            border-radius: 8px !important;
+        }
+
+        .shadow {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* Sharp Responsive Design */
+        @media (max-width: 768px) {
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .container {
+                padding: 1rem 0.5rem;
+            }
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="theme-icon"></i>
+    </div>
+
+    <!-- Modern Minimalist Navbar -->
+    <nav class="navbar navbar-dark bg-dark fixed-top shadow-sm" style="min-height:60px;">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <i class="fas fa-hospital fa-lg"></i>
+                <span class="fw-bold" style="font-size:1.3rem; letter-spacing:1px;">Kents International Hospital</span>
+            </a>
+            {% if session.get('logged_in') %}
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ url_for('doctor_profile') if session.get('user_type') == 'doctor' else url_for('pharmacist_profile') if session.get('user_type') == 'pharmacist' else url_for('lab_technician_profile') if session.get('user_type') == 'lab_technician' else url_for('dashboard') }}" class="btn btn-outline-light btn-sm" title="Profile">
+                        <i class="fas fa-user-circle"></i>
+                    </a>
+                    <a href="{{ url_for('doctor_logout') if session.get('user_type') == 'doctor' else url_for('pharmacist_logout') if session.get('user_type') == 'pharmacist' else url_for('lab_technician_logout') if session.get('user_type') == 'lab_technician' else url_for('logout') if session.get('user_type') != 'patient' else url_for('patient_logout') }}" class="btn btn-outline-danger btn-sm ms-1" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+    <div style="height:60px;"></div> <!-- Spacer for fixed navbar -->
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Modern Footer -->
+    <footer class="text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="mb-3">Kents International Hospital</h5>
+                    <p class="text-muted">Advanced healthcare management solution</p>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="#" class="text-muted"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-muted"><i class="fab fa-linkedin fa-lg"></i></a>
+                        <a href="#" class="text-muted"><i class="fab fa-github fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-3">
+            <p class="text-muted mb-0">&copy; {{ year or 2024 }} Kents International Hospital. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            
+            if (html.getAttribute('data-bs-theme') === 'light') {
+                html.setAttribute('data-bs-theme', 'dark');
+                icon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                html.setAttribute('data-bs-theme', 'light');
+                icon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Load saved theme
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            document.getElementById('theme-icon').className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+        });
+
+        // Enhanced SweetAlert2 for Flash Messages
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    Swal.fire({
+                        icon: '{{ 'success' if category == 'success' else 'error' if category == 'error' else 'info' }}',
+                        title: '{{ category|capitalize }}',
+                        text: {{ message|tojson }},
+                        timer: 4000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                        background: 'rgba(30, 30, 30, 0.95)',
+                        color: '#ffffff',
+                        backdrop: 'rgba(0, 0, 0, 0.8)',
+                        customClass: {
+                            popup: 'swal2-dark'
+                        }
+                    });
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        // Add loading states to buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn') && !e.target.disabled) {
+                const originalText = e.target.innerHTML;
+                e.target.innerHTML = '<span class="loading"></span> Loading...';
+                e.target.disabled = true;
+                
+                setTimeout(() => {
+                    e.target.innerHTML = originalText;
+                    e.target.disabled = false;
+                }, 2000);
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Sharp animations and interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add sharp hover effects
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+            
+            // Sharp button interactions
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('mousedown', function() {
+                    this.style.transform = 'translateY(1px) scale(0.98)';
+                });
+                
+                button.addEventListener('mouseup', function() {
+                    this.style.transform = 'translateY(-2px) scale(1)';
+                });
+            });
+            
+            // Sharp form focus effects
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

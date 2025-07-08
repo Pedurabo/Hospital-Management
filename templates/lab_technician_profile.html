@@ -1,0 +1,351 @@
+{% extends "base_dark.html" %}
+{% block title %}Profile - Lab Technician Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    /* Dark Mode Styling */
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        color: #e2e8f0;
+        min-height: 100vh;
+    }
+
+    .card {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(30, 64, 175, 0.1) 100%);
+        border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 15px 15px 0 0 !important;
+    }
+
+    .form-control, .form-select {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        color: #e2e8f0;
+        border-radius: 8px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: #3b82f6;
+        color: #e2e8f0;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+    }
+
+    .form-control::placeholder {
+        color: #64748b;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-outline-light {
+        border: 1px solid rgba(226, 232, 240, 0.3);
+        color: #e2e8f0;
+        border-radius: 8px;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-light:hover {
+        background: rgba(226, 232, 240, 0.1);
+        border-color: #e2e8f0;
+        color: #e2e8f0;
+    }
+
+    .profile-info {
+        background: rgba(59, 130, 246, 0.05);
+        border: 1px solid rgba(59, 130, 246, 0.1);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .info-label {
+        color: #93c5fd;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: #e2e8f0;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .alert {
+        border-radius: 10px;
+        border: none;
+        backdrop-filter: blur(10px);
+    }
+
+    .alert-success {
+        background: rgba(16, 185, 129, 0.1);
+        color: #6ee7b7;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .alert-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-user-cog me-2"></i>Lab Technician Profile
+                </h2>
+                <a href="{{ url_for('lab_technician_dashboard') }}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <div class="row">
+                <!-- Profile Information -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user me-2"></i>Personal Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="profile-info">
+                                <div class="info-label">Full Name</div>
+                                <div class="info-value">{{ lab_technician.technician_name }}</div>
+                                
+                                <div class="info-label">Email</div>
+                                <div class="info-value">{{ lab_technician.email }}</div>
+                                
+                                <div class="info-label">Phone Number</div>
+                                <div class="info-value">{{ lab_technician.phone_number }}</div>
+                                
+                                <div class="info-label">Specialization</div>
+                                <div class="info-value">{{ lab_technician.specialization }}</div>
+                                
+                                <div class="info-label">Laboratory</div>
+                                <div class="info-value">{{ lab_technician.laboratory_name }}</div>
+                                
+                                <div class="info-label">Hire Date</div>
+                                <div class="info-value">{{ lab_technician.hire_date.strftime('%B %d, %Y') if lab_technician.hire_date else 'Not specified' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Information -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-key me-2"></i>Account Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="profile-info">
+                                <div class="info-label">Username</div>
+                                <div class="info-value">{{ lab_technician.username }}</div>
+                                
+                                <div class="info-label">Account Status</div>
+                                <div class="info-value">
+                                    {% if lab_technician.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactive</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="info-label">Last Login</div>
+                                <div class="info-value">{{ lab_technician.last_login.strftime('%B %d, %Y at %I:%M %p') if lab_technician.last_login else 'Never' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Update Profile Form -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>Update Profile Information
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('lab_technician_update_profile') }}">
+                                <div class="mb-3">
+                                    <label for="technician_name" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="technician_name" name="technician_name" 
+                                           value="{{ lab_technician.technician_name }}" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="{{ lab_technician.email }}" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="phone_number" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                           value="{{ lab_technician.phone_number }}" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="specialization" class="form-label">Specialization</label>
+                                    <input type="text" class="form-control" id="specialization" name="specialization" 
+                                           value="{{ lab_technician.specialization }}" required>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Update Profile
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Change Password Form -->
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-lock me-2"></i>Change Password
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('lab_technician_change_password') }}">
+                                <div class="mb-3">
+                                    <label for="current_password" class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="new_password" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="new_password" name="new_password" 
+                                           minlength="6" required>
+                                    <div class="form-text text-muted">Password must be at least 6 characters long.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-key me-1"></i>Change Password
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Work Statistics -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>Work Statistics
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <div class="h3 text-primary">{{ stats.total_orders }}</div>
+                                        <div class="text-muted">Total Orders Processed</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <div class="h3 text-success">{{ stats.completed_orders }}</div>
+                                        <div class="text-muted">Completed Orders</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <div class="h3 text-warning">{{ stats.pending_orders }}</div>
+                                        <div class="text-muted">Pending Orders</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <div class="h3 text-info">{{ stats.reports_generated }}</div>
+                                        <div class="text-muted">Reports Generated</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Password confirmation validation
+    document.getElementById('confirm_password').addEventListener('input', function() {
+        const newPassword = document.getElementById('new_password').value;
+        const confirmPassword = this.value;
+        
+        if (newPassword !== confirmPassword) {
+            this.setCustomValidity('Passwords do not match');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+    
+    document.getElementById('new_password').addEventListener('input', function() {
+        const confirmPassword = document.getElementById('confirm_password');
+        if (confirmPassword.value) {
+            if (this.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity('Passwords do not match');
+            } else {
+                confirmPassword.setCustomValidity('');
+            }
+        }
+    });
+</script>
+{% endblock %} 

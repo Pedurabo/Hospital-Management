@@ -1,0 +1,85 @@
+{% extends "base_dark.html" %}
+{% block title %}Pharmacist Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card gradient-card animate__animated animate__fadeInUp">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-1 text-white"><i class="fas fa-tachometer-alt me-2"></i>Pharmacist Dashboard</h2>
+                            <p class="mb-0 text-light opacity-75">Manage prescriptions and drug inventory</p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-sm me-2">
+                                <i class="fas fa-home me-1"></i>Back to Home
+                            </a>
+                            <a href="{{ url_for('pharmacist_logout') }}" class="btn btn-outline-light">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    {% if notifications and notifications|length > 0 %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+                <div class="card-body">
+                    <div class="alert alert-warning alert-dismissible fade show glass-alert" role="alert">
+                        <i class="fas fa-bell me-2"></i>
+                        <strong>New Notifications:</strong>
+                        <ul class="mb-0 mt-2">
+                            {% for note in notifications %}
+                            <li>
+                                {{ note.message }}
+                                <form method="post" action="{{ url_for('mark_pharmacist_notification_read', notification_id=note.id) }}" style="display:inline">
+                                    <button type="submit" class="btn btn-sm btn-link text-warning">Mark as read</button>
+                                </form>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Dashboard content -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div class="card-body">
+                    {{ dashboard_content|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-alert {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .animate__fadeInUp {
+        animation-duration: 0.8s;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Page-specific JS here -->
+{% endblock %} 

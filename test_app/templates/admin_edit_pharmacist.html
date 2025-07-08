@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Edit Pharmacist{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Pharmacist Profile</h2>
+    <form method="POST">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="pharmacist_name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="pharmacist_name" name="pharmacist_name" value="{{ pharmacist.pharmacist_name }}" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="license_number" class="form-label">License Number</label>
+                <input type="text" class="form-control" id="license_number" name="license_number" value="{{ pharmacist.license_number }}" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="specialization" class="form-label">Specialization</label>
+                <input type="text" class="form-control" id="specialization" name="specialization" value="{{ pharmacist.specialization }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="phone_number" class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ pharmacist.phone_number }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ pharmacist.email }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="pharmacy_id" class="form-label">Pharmacy</label>
+                <select class="form-select" id="pharmacy_id" name="pharmacy_id" required>
+                    <option value="">Select Pharmacy</option>
+                    {% for pharmacy in pharmacies %}
+                        <option value="{{ pharmacy.id }}" {% if pharmacy.id == pharmacist.pharmacy_id %}selected{% endif %}>{{ pharmacy.pharmacy_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a href="{{ url_for('admin_pharmacists') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %} 

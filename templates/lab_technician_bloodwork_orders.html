@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+{% block title %}Bloodwork Orders - Lab Technician Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    /* Dark Mode Styling */
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        color: #e2e8f0;
+        min-height: 100vh;
+    }
+
+    .card {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(30, 64, 175, 0.1) 100%);
+        border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 15px 15px 0 0 !important;
+    }
+
+    .table {
+        color: #e2e8f0;
+        background: transparent;
+    }
+
+    .table th {
+        background: rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.2);
+        color: #93c5fd;
+        font-weight: 600;
+    }
+
+    .table td {
+        border-color: rgba(59, 130, 246, 0.1);
+        vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
+        background: rgba(59, 130, 246, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-warning:hover {
+        background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-processing {
+        background: rgba(59, 130, 246, 0.2);
+        color: #93c5fd;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .status-completed {
+        background: rgba(16, 185, 129, 0.2);
+        color: #6ee7b7;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-cancelled {
+        background: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #94a3b8;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .filters {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control, .form-select {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        color: #e2e8f0;
+        border-radius: 8px;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background: rgba(15, 23, 42, 0.9);
+        border-color: #3b82f6;
+        color: #e2e8f0;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+    }
+
+    .form-control::placeholder {
+        color: #64748b;
+    }
+
+    .stats-card {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(30, 64, 175, 0.1) 100%);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #3b82f6;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-label {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-flask me-2"></i>Bloodwork Orders
+                </h2>
+                <a href="{{ url_for('lab_technician_dashboard') }}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number">{{ stats.pending }}</div>
+                        <div class="stats-label">Pending Orders</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number">{{ stats.processing }}</div>
+                        <div class="stats-label">Processing</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number">{{ stats.completed }}</div>
+                        <div class="stats-label">Completed</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="stats-number">{{ stats.total }}</div>
+                        <div class="stats-label">Total Orders</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="status_filter" class="form-label">Status</label>
+                        <select class="form-select" id="status_filter" name="status">
+                            <option value="">All Statuses</option>
+                            <option value="pending" {% if request.args.get('status') == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="processing" {% if request.args.get('status') == 'processing' %}selected{% endif %}>Processing</option>
+                            <option value="completed" {% if request.args.get('status') == 'completed' %}selected{% endif %}>Completed</option>
+                            <option value="cancelled" {% if request.args.get('status') == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="date_filter" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date_filter" name="date" value="{{ request.args.get('date', '') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="doctor_filter" class="form-label">Doctor</label>
+                        <input type="text" class="form-control" id="doctor_filter" name="doctor" placeholder="Search by doctor name" value="{{ request.args.get('doctor', '') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i>Filter
+                            </button>
+                            <a href="{{ url_for('lab_technician_bloodwork_orders') }}" class="btn btn-outline-light">
+                                <i class="fas fa-times me-1"></i>Clear
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>All Bloodwork Orders
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if bloodwork_orders %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Patient</th>
+                                        <th>Doctor</th>
+                                        <th>Test Type</th>
+                                        <th>Order Date</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in bloodwork_orders %}
+                                    <tr>
+                                        <td>
+                                            <strong>#{{ order.id }}</strong>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ order.patient_name }}</strong>
+                                                <br>
+                                                <small class="text-muted">ID: {{ order.patient_id }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>Dr. {{ order.doctor_name }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ order.doctor_specialization }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ order.test_type }}</span>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ order.order_date.strftime('%b %d, %Y') }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ order.order_date.strftime('%I:%M %p') }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if order.priority == 'high' %}
+                                                <span class="badge bg-danger">High</span>
+                                            {% elif order.priority == 'medium' %}
+                                                <span class="badge bg-warning">Medium</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Low</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if order.status == 'pending' %}
+                                                <span class="status-badge status-pending">Pending</span>
+                                            {% elif order.status == 'processing' %}
+                                                <span class="status-badge status-processing">Processing</span>
+                                            {% elif order.status == 'completed' %}
+                                                <span class="status-badge status-completed">Completed</span>
+                                            {% elif order.status == 'cancelled' %}
+                                                <span class="status-badge status-cancelled">Cancelled</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                {% if order.status == 'pending' %}
+                                                    <a href="{{ url_for('lab_technician_process_order', order_id=order.id) }}" 
+                                                       class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-play me-1"></i>Process
+                                                    </a>
+                                                {% elif order.status == 'processing' %}
+                                                    <a href="{{ url_for('lab_technician_process_order', order_id=order.id) }}" 
+                                                       class="btn btn-warning btn-sm">
+                                                        <i class="fas fa-edit me-1"></i>Update
+                                                    </a>
+                                                {% elif order.status == 'completed' %}
+                                                    <a href="{{ url_for('lab_technician_view_report', report_id=order.report_id) }}" 
+                                                       class="btn btn-success btn-sm">
+                                                        <i class="fas fa-eye me-1"></i>View Report
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-flask"></i>
+                            <h4>No Bloodwork Orders Found</h4>
+                            <p class="text-muted">There are currently no bloodwork orders to display.</p>
+                            {% if request.args %}
+                                <a href="{{ url_for('lab_technician_bloodwork_orders') }}" class="btn btn-primary">
+                                    <i class="fas fa-times me-1"></i>Clear Filters
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-submit form when filters change
+    document.getElementById('status_filter').addEventListener('change', function() {
+        this.form.submit();
+    });
+    
+    document.getElementById('date_filter').addEventListener('change', function() {
+        this.form.submit();
+    });
+</script>
+{% endblock %} 

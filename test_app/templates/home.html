@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Kents International Hospital</title>
+    
+    <!-- Bootstrap 5 with Darkly Theme -->
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/darkly/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts - Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-accent: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--border-accent);
+        }
+
+        .btn {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="text-center mb-5">
+            <h1 class="display-4">Welcome to Kents International Hospital</h1>
+            <p class="lead text-muted">Please select your role to continue</p>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-shield fa-3x mb-3 text-primary"></i>
+                        <h5 class="card-title">Administrator</h5>
+                        <p class="card-text">Manage users, doctors, pharmacists, lab technicians, and system settings.</p>
+                        <a href="{{ url_for('login') }}" class="btn btn-primary mt-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Admin Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-md fa-3x mb-3 text-success"></i>
+                        <h5 class="card-title">Doctor</h5>
+                        <p class="card-text">Access patient records, manage appointments, and create medical reports.</p>
+                        <a href="{{ url_for('doctor_login') }}" class="btn btn-success mt-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Doctor Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-prescription-bottle-alt fa-3x mb-3 text-info"></i>
+                        <h5 class="card-title">Pharmacist</h5>
+                        <p class="card-text">Manage prescriptions, drug inventory, and dispensing records.</p>
+                        <a href="{{ url_for('pharmacist_login') }}" class="btn btn-info mt-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Pharmacist Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-flask fa-3x mb-3 text-warning"></i>
+                        <h5 class="card-title">Lab Technician</h5>
+                        <p class="card-text">Process laboratory orders and manage test reports.</p>
+                        <a href="{{ url_for('lab_technician_login') }}" class="btn btn-warning mt-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Lab Technician Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user fa-3x mb-3 text-secondary"></i>
+                        <h5 class="card-title">Patient</h5>
+                        <p class="card-text">View your appointments, medical history, and prescriptions.</p>
+                        <a href="{{ url_for('patient_login') }}" class="btn btn-secondary mt-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Patient Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Appointment - Hospital Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .appointment-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 2rem auto;
+            max-width: 800px;
+            padding: 2rem;
+        }
+        .header-section {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .header-section h2 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .header-section p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        .doctor-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        .doctor-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .doctor-name {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .doctor-specialization {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .doctor-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        .time-slot {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            background: #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .time-slot:hover {
+            background: #667eea;
+            color: white;
+        }
+        .time-slot.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .time-slot.unavailable {
+            background: #dc3545;
+            color: white;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem 1.5rem;
+        }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="appointment-container">
+            <!-- Header Section -->
+            <div class="header-section">
+                <h2><i class="fas fa-calendar-plus text-primary me-2"></i>Schedule Appointment</h2>
+                <p>Book an appointment with one of our qualified doctors</p>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Appointment Form -->
+            <form method="POST" id="appointmentForm">
+                <div class="form-section">
+                    <h4 class="mb-3"><i class="fas fa-user-md text-primary me-2"></i>Select Doctor</h4>
+                    
+                    {% if doctors %}
+                        <div class="row">
+                            {% for doctor in doctors %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="doctor-card">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="doctor_id" 
+                                                   id="doctor_{{ doctor.id }}" value="{{ doctor.id }}" required>
+                                            <label class="form-check-label" for="doctor_{{ doctor.id }}">
+                                                <div class="doctor-name">{{ doctor.doctor_name }}</div>
+                                                <div class="doctor-specialization">{{ doctor.specialization }}</div>
+                                                <div class="doctor-info">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>{{ doctor.office_location }}
+                                                </div>
+                                                <div class="doctor-info">
+                                                    <i class="fas fa-clock me-1"></i>{{ doctor.available_hours }}
+                                                </div>
+                                                <div class="doctor-info">
+                                                    <i class="fas fa-calendar me-1"></i>{{ doctor.available_days }}
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            No doctors are currently available. Please contact the administration.
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-section">
+                    <h4 class="mb-3"><i class="fas fa-calendar-alt text-primary me-2"></i>Appointment Details</h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="appointment_date" class="form-label">Appointment Date *</label>
+                            <input type="date" class="form-control" id="appointment_date" name="appointment_date" 
+                                   required min="{{ today_date }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="appointment_time" class="form-label">Appointment Time *</label>
+                            <select class="form-select" id="appointment_time" name="appointment_time" required>
+                                <option value="">Select a time slot</option>
+                            </select>
+                            <div id="timeSlots" class="mt-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="appointment_type" class="form-label">Appointment Type *</label>
+                            <select class="form-select" id="appointment_type" name="appointment_type" required>
+                                <option value="">Select appointment type</option>
+                                <option value="Consultation">Consultation</option>
+                                <option value="Follow-up">Follow-up</option>
+                                <option value="Emergency">Emergency</option>
+                                <option value="Routine Check">Routine Check</option>
+                                <option value="Specialist Visit">Specialist Visit</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="reason" class="form-label">Reason for Visit</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3" 
+                                      placeholder="Please describe your symptoms or reason for the appointment"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('patient_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-calendar-check me-2"></i>Schedule Appointment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('appointment_date').min = today;
+
+        // Default time slots (fallback if API fails)
+        const defaultTimeSlots = [
+            '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+            '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+            '15:00', '15:30', '16:00', '16:30', '17:00'
+        ];
+
+        // Handle doctor selection and date change
+        document.addEventListener('DOMContentLoaded', function() {
+            const doctorRadios = document.querySelectorAll('input[name="doctor_id"]');
+            const dateInput = document.getElementById('appointment_date');
+            const timeSelect = document.getElementById('appointment_time');
+            const timeSlotsDiv = document.getElementById('timeSlots');
+
+            function updateTimeSlots() {
+                const selectedDoctor = document.querySelector('input[name="doctor_id"]:checked');
+                const selectedDate = dateInput.value;
+
+                if (selectedDoctor && selectedDate) {
+                    // Show loading
+                    timeSelect.innerHTML = '<option value="">Loading available slots...</option>';
+                    timeSlotsDiv.innerHTML = '<div class="loading"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</div>';
+
+                    // Fetch available slots
+                    fetch(`/get_available_slots/${selectedDoctor.value}?date=${selectedDate}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            timeSelect.innerHTML = '<option value="">Select a time slot</option>';
+                            timeSlotsDiv.innerHTML = '';
+
+                            let slots = [];
+                            if (data.slots && data.slots.length > 0) {
+                                slots = data.slots;
+                            } else {
+                                // Use default slots if no data returned
+                                slots = defaultTimeSlots;
+                            }
+
+                            // Populate dropdown
+                            slots.forEach(slot => {
+                                const option = document.createElement('option');
+                                option.value = slot;
+                                option.textContent = slot;
+                                timeSelect.appendChild(option);
+                            });
+
+                            // Display time slots as buttons
+                            slots.forEach(slot => {
+                                const slotBtn = document.createElement('span');
+                                slotBtn.className = 'time-slot';
+                                slotBtn.textContent = slot;
+                                slotBtn.onclick = () => {
+                                    timeSelect.value = slot;
+                                    // Remove selected class from all slots
+                                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                                    // Add selected class to clicked slot
+                                    slotBtn.classList.add('selected');
+                                };
+                                timeSlotsDiv.appendChild(slotBtn);
+                            });
+
+                            // Show success message
+                            if (slots.length > 0) {
+                                timeSlotsDiv.innerHTML += '<div class="text-success mt-2"><small><i class="fas fa-check-circle me-1"></i>Time slots loaded successfully</small></div>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching time slots:', error);
+                            timeSelect.innerHTML = '<option value="">Error loading slots</option>';
+                            timeSlotsDiv.innerHTML = '<div class="text-danger">Error loading time slots. Using default slots.</div>';
+                            
+                            // Fallback to default slots
+                            timeSelect.innerHTML = '<option value="">Select a time slot</option>';
+                            defaultTimeSlots.forEach(slot => {
+                                const option = document.createElement('option');
+                                option.value = slot;
+                                option.textContent = slot;
+                                timeSelect.appendChild(option);
+                            });
+
+                            // Display default time slots as buttons
+                            defaultTimeSlots.forEach(slot => {
+                                const slotBtn = document.createElement('span');
+                                slotBtn.className = 'time-slot';
+                                slotBtn.textContent = slot;
+                                slotBtn.onclick = () => {
+                                    timeSelect.value = slot;
+                                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                                    slotBtn.classList.add('selected');
+                                };
+                                timeSlotsDiv.appendChild(slotBtn);
+                            });
+                        });
+                } else {
+                    // Clear time slots if no doctor or date selected
+                    timeSelect.innerHTML = '<option value="">Select a time slot</option>';
+                    timeSlotsDiv.innerHTML = '<div class="text-muted">Please select a doctor and date first.</div>';
+                }
+            }
+
+            // Event listeners
+            doctorRadios.forEach(radio => {
+                radio.addEventListener('change', updateTimeSlots);
+            });
+
+            dateInput.addEventListener('change', updateTimeSlots);
+
+            // Initialize time slots if doctor and date are already selected
+            if (document.querySelector('input[name="doctor_id"]:checked') && dateInput.value) {
+                updateTimeSlots();
+            }
+        });
+
+        // Form validation and submission
+        document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+            const doctorSelected = document.querySelector('input[name="doctor_id"]:checked');
+            const date = document.getElementById('appointment_date').value;
+            const time = document.getElementById('appointment_time').value;
+            const type = document.getElementById('appointment_type').value;
+
+            if (!doctorSelected || !date || !time || !type) {
+                e.preventDefault();
+                alert('Please fill in all required fields: Doctor, Date, Time, and Appointment Type.');
+                return false;
+            }
+
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Scheduling...';
+            submitBtn.disabled = true;
+
+            // Re-enable button after 10 seconds as fallback
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 10000);
+
+            return true;
+        });
+
+        // Add click handlers for time slot buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('time-slot')) {
+                const timeSelect = document.getElementById('appointment_time');
+                timeSelect.value = e.target.textContent;
+                
+                // Update visual selection
+                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                e.target.classList.add('selected');
+            }
+        });
+    </script>
+</body>
+</html> 

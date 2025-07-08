@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% block title %}Prescription Details{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-prescription-bottle-medical me-2"></i>Prescription Details
+        </h1>
+        <div>
+            <a href="{{ url_for('pharmacist_prescriptions') }}" class="btn btn-secondary btn-sm me-2">
+                <i class="fas fa-arrow-left me-1"></i>Back to Prescriptions
+            </a>
+            <a href="{{ url_for('pharmacist_dispense_prescription', prescription_id=prescription.id) }}" 
+               class="btn btn-success btn-sm">
+                <i class="fas fa-pills me-1"></i>Dispense
+            </a>
+        </div>
+    </div>
+
+    {% if prescription %}
+    <!-- Prescription Information -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-info-circle me-2"></i>Prescription Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Prescription ID:</strong></td>
+                                    <td>#{{ prescription.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Patient:</strong></td>
+                                    <td>{{ prescription.patient_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Doctor:</strong></td>
+                                    <td>{{ prescription.doctor_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Specialization:</strong></td>
+                                    <td>{{ prescription.doctor_specialization or 'N/A' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Date:</strong></td>
+                                    <td>{{ prescription.prescription_date.strftime('%Y-%m-%d') if prescription.prescription_date else 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td>
+                                        {% if prescription.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif prescription.status == 'dispensed' %}
+                                            <span class="badge bg-success">Dispensed</span>
+                                        {% elif prescription.status == 'cancelled' %}
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ prescription.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Diagnosis:</strong></td>
+                                    <td>{{ prescription.diagnosis or 'N/A' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Notes:</strong></td>
+                                    <td>{{ prescription.notes or 'N/A' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Information -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-user me-2"></i>Patient Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="avatar-lg bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center">
+                            {{ prescription.patient_name[0] if prescription.patient_name else 'P' }}
+                        </div>
+                    </div>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Name:</strong></td>
+                            <td>{{ prescription.patient_name }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Age:</strong></td>
+                            <td>{{ prescription.patient_age or 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sex:</strong></td>
+                            <td>{{ prescription.patient_sex or 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Phone:</strong></td>
+                            <td>{{ prescription.patient_phone or 'N/A' }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prescription Items -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-pills me-2"></i>Prescription Items
+            </h6>
+        </div>
+        <div class="card-body">
+            {% if prescription_items %}
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Drug</th>
+                            <th>Generic Name</th>
+                            <th>Dosage</th>
+                            <th>Frequency</th>
+                            <th>Duration</th>
+                            <th>Quantity</th>
+                            <th>Instructions</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in prescription_items %}
+                        <tr>
+                            <td>
+                                <strong>{{ item.drug_name }}</strong><br>
+                                <small class="text-muted">{{ item.strength }} {{ item.unit }}</small>
+                            </td>
+                            <td>{{ item.generic_name or 'N/A' }}</td>
+                            <td>{{ item.dosage }}</td>
+                            <td>{{ item.frequency }}</td>
+                            <td>{{ item.duration }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.instructions or 'N/A' }}</td>
+                            <td>${{ "%.2f"|format(item.price or 0) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-pills fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No Prescription Items</h5>
+                <p class="text-muted">This prescription has no items to dispense.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <a href="{{ url_for('pharmacist_prescriptions') }}" class="btn btn-secondary me-2">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Prescriptions
+                    </a>
+                    {% if prescription.status == 'pending' %}
+                    <a href="{{ url_for('pharmacist_dispense_prescription', prescription_id=prescription.id) }}" 
+                       class="btn btn-success me-2">
+                        <i class="fas fa-pills me-1"></i>Dispense Prescription
+                    </a>
+                    {% endif %}
+                    <button type="button" class="btn btn-outline-danger delete-prescription-btn"
+                            data-prescription-id="{{ prescription.id }}"
+                            data-patient-name="{{ prescription.patient_name }}"
+                            title="Delete Prescription">
+                        <i class="fas fa-trash me-1"></i>Delete Prescription
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Prescription Not Found -->
+    <div class="card shadow">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+            <h4 class="text-warning">Prescription Not Found</h4>
+            <p class="text-muted">The prescription you're looking for doesn't exist or has been removed.</p>
+            <a href="{{ url_for('pharmacist_prescriptions') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Prescriptions
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Delete Prescription Modal -->
+<div class="modal fade" id="deletePrescriptionModal" tabindex="-1" aria-labelledby="deletePrescriptionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deletePrescriptionModalLabel">
+                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>Delete Prescription
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this prescription?</p>
+                <div class="alert alert-warning">
+                    <strong>Prescription ID:</strong> <span id="deletePrescriptionId"></span><br>
+                    <strong>Patient:</strong> <span id="deletePrescriptionPatient"></span>
+                </div>
+                <p class="text-danger">
+                    <i class="fas fa-info-circle me-1"></i>
+                    This action cannot be undone. The prescription and all its items will be permanently removed.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deletePrescriptionForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Delete Prescription
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function deletePrescription(prescriptionId, patientName) {
+    console.log('deletePrescription called with:', prescriptionId, patientName);
+    
+    // Set the prescription details in the modal
+    document.getElementById('deletePrescriptionId').textContent = '#' + prescriptionId;
+    document.getElementById('deletePrescriptionPatient').textContent = patientName;
+    
+    // Set the form action
+    document.getElementById('deletePrescriptionForm').action = `/pharmacist/delete_prescription/${prescriptionId}`;
+    
+    // Show the modal using Bootstrap 5
+    const modalElement = document.getElementById('deletePrescriptionModal');
+    console.log('Modal element:', modalElement);
+    
+    if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        console.log('Bootstrap modal object:', modal);
+        modal.show();
+    } else {
+        console.error('Modal element not found!');
+    }
+}
+
+// Initialize delete button functionality
+$(document).ready(function() {
+    // Use event delegation for delete buttons
+    $(document).on('click', '.delete-prescription-btn', function(e) {
+        e.preventDefault();
+        console.log('Delete button clicked');
+        
+        const prescriptionId = $(this).data('prescription-id');
+        const patientName = $(this).data('patient-name');
+        
+        console.log('Prescription ID:', prescriptionId);
+        console.log('Patient Name:', patientName);
+        
+        deletePrescription(prescriptionId, patientName);
+    });
+});
+</script>
+{% endblock %} 

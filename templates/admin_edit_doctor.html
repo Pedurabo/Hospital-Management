@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Doctor - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-edit"></i> Edit Doctor</h1>
+    <p>Update doctor information and professional details</p>
+</div>
+
+<div class="content-body">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-md"></i> Edit Doctor Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin_edit_doctor', doctor_id=doctor.id) }}">
+                        <div class="row">
+                            <!-- Personal Information -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="fas fa-user"></i> Personal Information</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="doctor_name" class="form-label">Doctor Name *</label>
+                                    <input type="text" class="form-control" id="doctor_name" name="doctor_name" 
+                                           value="{{ doctor.doctor_name or '' }}" required placeholder="Dr. John Smith">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="specialization" class="form-label">Specialization *</label>
+                                    <select class="form-select" id="specialization" name="specialization" required>
+                                        <option value="">Select Specialization</option>
+                                        <option value="Cardiology" {% if doctor.specialization == 'Cardiology' %}selected{% endif %}>Cardiology</option>
+                                        <option value="Dermatology" {% if doctor.specialization == 'Dermatology' %}selected{% endif %}>Dermatology</option>
+                                        <option value="Endocrinology" {% if doctor.specialization == 'Endocrinology' %}selected{% endif %}>Endocrinology</option>
+                                        <option value="Gastroenterology" {% if doctor.specialization == 'Gastroenterology' %}selected{% endif %}>Gastroenterology</option>
+                                        <option value="General Medicine" {% if doctor.specialization == 'General Medicine' %}selected{% endif %}>General Medicine</option>
+                                        <option value="Neurology" {% if doctor.specialization == 'Neurology' %}selected{% endif %}>Neurology</option>
+                                        <option value="Oncology" {% if doctor.specialization == 'Oncology' %}selected{% endif %}>Oncology</option>
+                                        <option value="Orthopedics" {% if doctor.specialization == 'Orthopedics' %}selected{% endif %}>Orthopedics</option>
+                                        <option value="Pediatrics" {% if doctor.specialization == 'Pediatrics' %}selected{% endif %}>Pediatrics</option>
+                                        <option value="Psychiatry" {% if doctor.specialization == 'Psychiatry' %}selected{% endif %}>Psychiatry</option>
+                                        <option value="Radiology" {% if doctor.specialization == 'Radiology' %}selected{% endif %}>Radiology</option>
+                                        <option value="Surgery" {% if doctor.specialization == 'Surgery' %}selected{% endif %}>Surgery</option>
+                                        <option value="Urology" {% if doctor.specialization == 'Urology' %}selected{% endif %}>Urology</option>
+                                        <option value="Other" {% if doctor.specialization and doctor.specialization not in ['Cardiology', 'Dermatology', 'Endocrinology', 'Gastroenterology', 'General Medicine', 'Neurology', 'Oncology', 'Orthopedics', 'Pediatrics', 'Psychiatry', 'Radiology', 'Surgery', 'Urology'] %}selected{% endif %}>Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="{{ doctor.email or '' }}" placeholder="doctor@hospital.com">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="phone_number" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                           value="{{ doctor.phone_number or '' }}" placeholder="+1 (555) 123-4567">
+                                </div>
+                            </div>
+                            
+                            <!-- Professional Information -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="fas fa-briefcase"></i> Professional Information</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="office_location" class="form-label">Office Location</label>
+                                    <input type="text" class="form-control" id="office_location" name="office_location" 
+                                           value="{{ doctor.office_location or '' }}" placeholder="Building A, Floor 3, Room 301">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="available_days" class="form-label">Available Days</label>
+                                    <select class="form-select" id="available_days" name="available_days">
+                                        <option value="">Select Days</option>
+                                        <option value="Monday-Friday" {% if doctor.available_days == 'Monday-Friday' %}selected{% endif %}>Monday-Friday</option>
+                                        <option value="Monday-Saturday" {% if doctor.available_days == 'Monday-Saturday' %}selected{% endif %}>Monday-Saturday</option>
+                                        <option value="Tuesday-Thursday" {% if doctor.available_days == 'Tuesday-Thursday' %}selected{% endif %}>Tuesday-Thursday</option>
+                                        <option value="Weekends Only" {% if doctor.available_days == 'Weekends Only' %}selected{% endif %}>Weekends Only</option>
+                                        <option value="Flexible" {% if doctor.available_days == 'Flexible' %}selected{% endif %}>Flexible</option>
+                                        <option value="By Appointment" {% if doctor.available_days == 'By Appointment' %}selected{% endif %}>By Appointment</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="available_hours" class="form-label">Available Hours</label>
+                                    <select class="form-select" id="available_hours" name="available_hours">
+                                        <option value="">Select Hours</option>
+                                        <option value="9:00 AM - 5:00 PM" {% if doctor.available_hours == '9:00 AM - 5:00 PM' %}selected{% endif %}>9:00 AM - 5:00 PM</option>
+                                        <option value="8:00 AM - 4:00 PM" {% if doctor.available_hours == '8:00 AM - 4:00 PM' %}selected{% endif %}>8:00 AM - 4:00 PM</option>
+                                        <option value="10:00 AM - 6:00 PM" {% if doctor.available_hours == '10:00 AM - 6:00 PM' %}selected{% endif %}>10:00 AM - 6:00 PM</option>
+                                        <option value="Morning Only" {% if doctor.available_hours == 'Morning Only' %}selected{% endif %}>Morning Only</option>
+                                        <option value="Afternoon Only" {% if doctor.available_hours == 'Afternoon Only' %}selected{% endif %}>Afternoon Only</option>
+                                        <option value="Evening Only" {% if doctor.available_hours == 'Evening Only' %}selected{% endif %}>Evening Only</option>
+                                        <option value="24/7" {% if doctor.available_hours == '24/7' %}selected{% endif %}>24/7</option>
+                                        <option value="By Appointment" {% if doctor.available_hours == 'By Appointment' %}selected{% endif %}>By Appointment</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('admin_doctors') }}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Back to Doctors
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Update Doctor Information
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Doctor Account Information -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-key"></i> Account Information</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Note:</strong> To manage the doctor's login credentials, please use the 
+                        <a href="{{ url_for('admin_doctor_accounts') }}" class="alert-link">Doctor Accounts</a> section.
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Doctor ID:</strong> <span class="badge bg-secondary">{{ doctor.id }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Last Updated:</strong> 
+                                {% if doctor.updated_at %}
+                                    {{ doctor.updated_at.strftime('%Y-%m-%d %H:%M') if doctor.updated_at is not string else doctor.updated_at }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

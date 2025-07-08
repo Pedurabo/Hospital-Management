@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Dispensing Receipt - Pharmacist Panel{% endblock %}
+
+{% block content %}
+<div class="content-header d-print-none">
+    <h1><i class="fas fa-receipt"></i> Dispensing Receipt</h1>
+    <p>Below is the official receipt for the dispensed prescription.</p>
+</div>
+
+<div class="content-body">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-check-circle"></i> Dispensing Receipt</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Patient Name:</strong> {{ prescription.patient_name }}<br>
+                            <strong>Age:</strong> {{ prescription.age }}<br>
+                            <strong>Sex:</strong> {{ prescription.sex }}<br>
+                            <strong>Phone:</strong> {{ prescription.phone_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Doctor:</strong> {{ prescription.doctor_name }}<br>
+                            <strong>Diagnosis:</strong> {{ prescription.diagnosis }}<br>
+                            <strong>Date:</strong> {{ prescription.prescription_date.strftime('%Y-%m-%d') if prescription.prescription_date else 'N/A' }}<br>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Prescription Notes:</strong> {{ prescription.notes or 'None' }}
+                    </div>
+                    <hr>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Dispensed By:</strong> {{ pharmacist.pharmacist_name }}<br>
+                            <strong>License No.:</strong> {{ pharmacist.license_number }}<br>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Dispensing Date:</strong> {{ dispensing.dispensing_date.strftime('%Y-%m-%d %H:%M') if dispensing.dispensing_date else 'N/A' }}<br>
+                            <strong>Receipt No.:</strong> {{ dispensing.id }}
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Dispensing Notes:</strong> {{ dispensing.notes or 'None' }}
+                    </div>
+                    <hr>
+                    <h5 class="mb-3"><i class="fas fa-pills"></i> Medications Dispensed</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Drug</th>
+                                    <th>Dosage</th>
+                                    <th>Frequency</th>
+                                    <th>Duration</th>
+                                    <th>Quantity</th>
+                                    <th>Instructions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in prescription_items %}
+                                <tr>
+                                    <td>{{ item.drug_name }}</td>
+                                    <td>{{ item.dosage }}</td>
+                                    <td>{{ item.frequency }}</td>
+                                    <td>{{ item.duration }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>{{ item.instructions or 'N/A' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 mb-2">
+                        <h4>Total Amount Paid: <span class="text-success">₦{{ '%.2f'|format(dispensing.total_amount) }}</span></h4>
+                    </div>
+                    <div class="text-center d-print-none">
+                        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print Receipt</button>
+                        <a href="{{ url_for('pharmacist_prescriptions') }}" class="btn btn-secondary ms-2">Back to Prescriptions</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% block title %}Manage Pharmacists{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Pharmacist Accounts</h2>
+        <div>
+            <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary btn-sm me-2">
+                <i class="fas fa-arrow-left me-1"></i>Back to Admin Panel
+            </a>
+            {% if session.get('is_admin') %}
+                <a href="{{ url_for('admin_pharmacist_credentials') }}" class="btn btn-info btn-sm me-2">
+                    <i class="fas fa-key me-1"></i>Manage Credentials
+                </a>
+                <a href="{{ url_for('admin_pharmacist_credentials_report') }}" class="btn btn-danger btn-sm me-2">
+                    <i class="fas fa-file-alt me-1"></i>Credentials Report
+                </a>
+                <a href="{{ url_for('admin_add_pharmacist') }}" class="btn btn-primary">Add New Pharmacist</a>
+            {% endif %}
+        </div>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">All Pharmacists</h5>
+        </div>
+        <div class="card-body">
+            {% if pharmacists %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>License</th>
+                            <th>Username</th>
+                            <th>Specialization</th>
+                            <th>Pharmacy</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in pharmacists %}
+                        <tr>
+                            <td>{{ p.id }}</td>
+                            <td>{{ p.pharmacist_name }}</td>
+                            <td>{{ p.license_number }}</td>
+                            <td>
+                                {% if p.username %}
+                                    <span class="text-primary fw-bold">{{ p.username }}</span>
+                                {% else %}
+                                    <span class="text-muted">No account</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ p.specialization or 'N/A' }}</td>
+                            <td>{{ p.pharmacy_name or 'N/A' }}</td>
+                            <td>{{ p.email or 'N/A' }}</td>
+                            <td>{{ p.phone_number or 'N/A' }}</td>
+                            <td>
+                                {% if p.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if p.last_login %}
+                                    <small class="text-muted">{{ p.last_login.strftime('%Y-%m-%d %H:%M') if p.last_login else 'Never' }}</small>
+                                {% else %}
+                                    <small class="text-muted">Never</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if session.get('is_admin') %}
+                                    {% if p.username %}
+                                        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#credentialsModal{{ p.id }}">
+                                            <i class="fas fa-key"></i> Credentials
+                                        </button>
+                                        <form method="POST" action="{{ url_for('admin_reset_pharmacist_password', pharmacist_id=p.id) }}" style="display:inline-block;" onsubmit="return confirm('Reset password to default (password)?');">
+                                            <button type="submit" class="btn btn-warning btn-sm">
+                                                <i class="fas fa-undo"></i> Reset Password
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    <a href="{{ url_for('admin_edit_pharmacist', pharmacist_id=p.id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                    <form method="POST" action="{{ url_for('admin_toggle_pharmacist_status', pharmacist_id=p.id) }}" style="display:inline-block;">
+                                        <input type="hidden" name="username" value="{{ p.username }}">
+                                        <button type="submit" class="btn btn-secondary btn-sm">{{ 'Deactivate' if p.is_active else 'Activate' }}</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('admin_delete_pharmacist', pharmacist_id=p.id) }}" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this pharmacist?');">
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-muted">Admin access required</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">No pharmacists found.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Credentials Modals -->
+{% for p in pharmacists %}
+{% if p.username %}
+<div class="modal fade" id="credentialsModal{{ p.id }}" tabindex="-1" aria-labelledby="credentialsModalLabel{{ p.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="credentialsModalLabel{{ p.id }}">
+                    <i class="fas fa-key"></i> Pharmacist Login Credentials
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Login URL:</strong> <a href="{{ url_for('pharmacist_login') }}" target="_blank">{{ url_for('pharmacist_login') }}</a>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Username:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="{{ p.username }}" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('{{ p.username }}')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Password:</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" value="password" readonly id="password{{ p.id }}">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('password{{ p.id }}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('password')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Note:</strong> The default password is "password". Pharmacists should change their password after first login.
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Admin Tip:</strong> Use the "Reset Password" button to reset a pharmacist's password back to "password" if they forget their credentials.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{{ url_for('pharmacist_login') }}" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Go to Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        // Show a temporary success message
+        const button = event.target.closest('button');
+        const originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i>';
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-success');
+        
+        setTimeout(function() {
+            button.innerHTML = originalHTML;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-secondary');
+        }, 1000);
+    });
+}
+
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const button = input.nextElementSibling;
+    const icon = button.querySelector('i');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>
+{% endblock %} 

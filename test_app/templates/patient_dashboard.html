@@ -1,0 +1,383 @@
+{% extends "base_dark.html" %}
+{% block title %}Patient Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h4 class="mb-0">
+                                <i class="fas fa-user-injured me-2"></i>Welcome, {{ patient_details.patient_name if patient_details else session.get('username', 'Patient') }}
+                            </h4>
+                            <p class="mb-0 text-light">Your Personal Medical Portal</p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-sm me-2">
+                                <i class="fas fa-home me-1"></i>Back to Home
+                            </a>
+                            <a href="{{ url_for('patient_logout') }}" class="btn btn-outline-light">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('schedule_appointment') }}" class="btn btn-primary w-100">
+                                <i class="fas fa-calendar-plus me-2"></i>Schedule Appointment
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('my_appointments') }}" class="btn btn-info w-100">
+                                <i class="fas fa-calendar-check me-2"></i>My Appointments
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="#personal-info" class="btn btn-success w-100" data-bs-toggle="collapse">
+                                <i class="fas fa-user-edit me-2"></i>Update Information
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="#medical-info" class="btn btn-warning w-100" data-bs-toggle="collapse">
+                                <i class="fas fa-heartbeat me-2"></i>Medical Info
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Information Summary -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    {% if patient_details %}
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p><strong>Name:</strong> {{ patient_details.patient_name }}</p>
+                            <p><strong>Age:</strong> {{ patient_details.age }} years</p>
+                            <p><strong>Gender:</strong> {{ patient_details.sex }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p><strong>Phone:</strong> {{ patient_details.phone_number or 'Not provided' }}</p>
+                            <p><strong>Email:</strong> {{ patient_details.email or 'Not provided' }}</p>
+                            <p><strong>Address:</strong> {{ patient_details.address or 'Not provided' }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No patient information available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-heartbeat me-2"></i>Medical Summary</h5>
+                </div>
+                <div class="card-body">
+                    {% if patient_details %}
+                    <div class="row">
+                        <div class="col-12">
+                            <p><strong>Medical History:</strong></p>
+                            <p class="text-muted">{{ patient_details.medical_history or 'No medical history recorded' }}</p>
+                            <p><strong>Current Medications:</strong></p>
+                            <p class="text-muted">{{ patient_details.current_medications or 'No current medications' }}</p>
+                            <p><strong>Emergency Contact:</strong></p>
+                            <p class="text-muted">
+                                {% if patient_details.emergency_contact_name %}
+                                    {{ patient_details.emergency_contact_name }} - {{ patient_details.emergency_contact_phone or 'No phone' }}
+                                {% else %}
+                                    Not provided
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No medical information available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Personal Information Form -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card collapse" id="personal-info">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user-edit me-2"></i>Update Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('patient_update_info') }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="patient_name" class="form-label">
+                                        <i class="fas fa-user me-1"></i>Full Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="patient_name" name="patient_name" 
+                                           value="{{ patient_details.patient_name if patient_details else '' }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="age" class="form-label">
+                                        <i class="fas fa-birthday-cake me-1"></i>Age <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="age" name="age" 
+                                           min="1" max="150" value="{{ patient_details.age if patient_details else '' }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sex" class="form-label">
+                                        <i class="fas fa-venus-mars me-1"></i>Sex <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="sex" name="sex" required>
+                                        <option value="">Select sex</option>
+                                        <option value="Male" {% if patient_details and patient_details.sex == 'Male' %}selected{% endif %}>Male</option>
+                                        <option value="Female" {% if patient_details and patient_details.sex == 'Female' %}selected{% endif %}>Female</option>
+                                        <option value="Other" {% if patient_details and patient_details.sex == 'Other' %}selected{% endif %}>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="phone_number" class="form-label">
+                                        <i class="fas fa-phone me-1"></i>Phone Number
+                                    </label>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                           value="{{ patient_details.phone_number if patient_details else '' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">
+                                        <i class="fas fa-envelope me-1"></i>Email Address
+                                    </label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="{{ patient_details.email if patient_details else '' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">
+                                        <i class="fas fa-map-marker-alt me-1"></i>Address
+                                    </label>
+                                    <textarea class="form-control" id="address" name="address" rows="3">{{ patient_details.address if patient_details else '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Update Information
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Medical Information Form -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card collapse" id="medical-info">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-heartbeat me-2"></i>Update Medical Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('patient_update_medical_info') }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="medical_history" class="form-label">
+                                        <i class="fas fa-notes-medical me-1"></i>Medical History
+                                    </label>
+                                    <textarea class="form-control" id="medical_history" name="medical_history" rows="4" 
+                                              placeholder="Enter any relevant medical history, allergies, or conditions...">{{ patient_details.medical_history if patient_details else '' }}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="current_medications" class="form-label">
+                                        <i class="fas fa-pills me-1"></i>Current Medications
+                                    </label>
+                                    <textarea class="form-control" id="current_medications" name="current_medications" rows="3"
+                                              placeholder="List any current medications you are taking...">{{ patient_details.current_medications if patient_details else '' }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="emergency_contact_name" class="form-label">
+                                        <i class="fas fa-user-shield me-1"></i>Emergency Contact Name
+                                    </label>
+                                    <input type="text" class="form-control" id="emergency_contact_name" name="emergency_contact_name" 
+                                           value="{{ patient_details.emergency_contact_name if patient_details else '' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="emergency_contact_phone" class="form-label">
+                                        <i class="fas fa-phone me-1"></i>Emergency Contact Phone
+                                    </label>
+                                    <input type="tel" class="form-control" id="emergency_contact_phone" name="emergency_contact_phone" 
+                                           value="{{ patient_details.emergency_contact_phone if patient_details else '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-1"></i>Update Medical Information
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Quick Links</h6>
+                            <ul class="list-unstyled">
+                                <li><a href="{{ url_for('schedule_appointment') }}" class="text-decoration-none">
+                                    <i class="fas fa-calendar-plus me-2"></i>Schedule New Appointment
+                                </a></li>
+                                <li><a href="{{ url_for('my_appointments') }}" class="text-decoration-none">
+                                    <i class="fas fa-calendar-check me-2"></i>View All Appointments
+                                </a></li>
+                                <li><a href="#personal-info" class="text-decoration-none" data-bs-toggle="collapse">
+                                    <i class="fas fa-user-edit me-2"></i>Edit Personal Information
+                                </a></li>
+                                <li><a href="#medical-info" class="text-decoration-none" data-bs-toggle="collapse">
+                                    <i class="fas fa-heartbeat me-2"></i>Update Medical Information
+                                </a></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Important Notes</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-info-circle me-2 text-info"></i>Keep your information up to date</li>
+                                <li><i class="fas fa-info-circle me-2 text-info"></i>Schedule appointments in advance</li>
+                                <li><i class="fas fa-info-circle me-2 text-info"></i>Update medical history regularly</li>
+                                <li><i class="fas fa-info-circle me-2 text-info"></i>Contact your doctor for urgent matters</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        border-bottom: 1px solid #334155;
+    }
+    
+    .form-control, .form-select {
+        background: #374151;
+        border: 1px solid #4b5563;
+        color: #e2e8f0;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        background: #374151;
+        border-color: #3b82f6;
+        color: #e2e8f0;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+    }
+    
+    .form-label {
+        color: #e2e8f0;
+        font-weight: 500;
+    }
+    
+    .btn {
+        border-radius: 0.5rem;
+        font-weight: 500;
+    }
+    
+    .collapse {
+        transition: all 0.3s ease;
+    }
+    
+    .text-decoration-none {
+        color: #60a5fa;
+    }
+    
+    .text-decoration-none:hover {
+        color: #93c5fd;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const requiredFields = form.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+            }
+        });
+    });
+    
+    // Age validation
+    const ageInput = document.getElementById('age');
+    if (ageInput) {
+        ageInput.addEventListener('input', function() {
+            const age = parseInt(this.value);
+            if (age < 1 || age > 150) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

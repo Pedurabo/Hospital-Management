@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Doctors - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-stethoscope"></i> Manage Doctors</h1>
+    <p>View and manage all doctors in the system</p>
+</div>
+
+<div class="content-body">
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="number">{{ doctors|length }}</div>
+                <div class="label">Total Doctors</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <div class="number">{{ doctors|selectattr('specialization', 'equalto', 'Cardiology')|list|length }}</div>
+                <div class="label">Cardiologists</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                <div class="number">{{ doctors|selectattr('specialization', 'equalto', 'General Medicine')|list|length }}</div>
+                <div class="label">General Medicine</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <div class="number">{{ doctors|selectattr('specialization', 'equalto', 'Pediatrics')|list|length }}</div>
+                <div class="label">Pediatricians</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{{ url_for('admin_add_doctor') }}" class="btn btn-primary">
+                                <i class="fas fa-plus-circle"></i> Add New Doctor
+                            </a>
+                            <a href="{{ url_for('admin_doctor_accounts') }}" class="btn btn-outline-info ms-2">
+                                <i class="fas fa-user-md"></i> Doctor Accounts
+                            </a>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Admin Panel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctors Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-user-md"></i> All Doctors</h5>
+            <span class="badge bg-primary">{{ doctors|length }} doctors</span>
+        </div>
+        <div class="card-body">
+            {% if doctors %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-user"></i> Doctor Name</th>
+                            <th><i class="fas fa-stethoscope"></i> Specialization</th>
+                            <th><i class="fas fa-envelope"></i> Email</th>
+                            <th><i class="fas fa-phone"></i> Phone</th>
+                            <th><i class="fas fa-map-marker-alt"></i> Office</th>
+                            <th><i class="fas fa-clock"></i> Availability</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doctor in doctors %}
+                        <tr>
+                            <td><span class="badge bg-secondary">{{ doctor.id }}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-2" style="width: 35px; height: 35px; font-size: 0.9rem;">
+                                        {{ doctor.doctor_name[0].upper() if doctor.doctor_name else 'D' }}
+                                    </div>
+                                    <div>
+                                        <strong>{{ doctor.doctor_name or 'N/A' }}</strong>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ doctor.specialization or 'N/A' }}</span>
+                            </td>
+                            <td>
+                                {% if doctor.email %}
+                                    <a href="mailto:{{ doctor.email }}" class="text-decoration-none">
+                                        {{ doctor.email }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if doctor.phone_number %}
+                                    <a href="tel:{{ doctor.phone_number }}" class="text-decoration-none">
+                                        {{ doctor.phone_number }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ doctor.office_location or 'N/A' }}</small>
+                            </td>
+                            <td>
+                                <div class="small">
+                                    {% if doctor.available_days %}
+                                        <div><strong>Days:</strong> {{ doctor.available_days }}</div>
+                                    {% endif %}
+                                    {% if doctor.available_hours %}
+                                        <div><strong>Hours:</strong> {{ doctor.available_hours }}</div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('admin_edit_doctor', doctor_id=doctor.id) }}" 
+                                       class="btn btn-sm btn-outline-primary" 
+                                       data-bs-toggle="tooltip" 
+                                       title="Edit Doctor">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-info" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#doctorModal{{ doctor.id }}"
+                                            title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <form method="POST" action="{{ url_for('admin_delete_doctor', doctor_id=doctor.id) }}" 
+                                          style="display: inline;"
+                                          onsubmit="return confirmDelete('Are you sure you want to delete doctor \"{{ doctor.doctor_name }}\"? This action cannot be undone.')">
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-outline-danger" 
+                                                data-bs-toggle="tooltip" 
+                                                title="Delete Doctor">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No doctors found</h5>
+                <p class="text-muted">No doctors have been added to the system yet.</p>
+                <a href="{{ url_for('admin_add_doctor') }}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> Add First Doctor
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Doctor Detail Modals -->
+{% for doctor in doctors %}
+<div class="modal fade" id="doctorModal{{ doctor.id }}" tabindex="-1" aria-labelledby="doctorModalLabel{{ doctor.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="doctorModalLabel{{ doctor.id }}">
+                    <i class="fas fa-user-md"></i> Doctor Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Personal Information</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Name:</strong></td>
+                                <td>{{ doctor.doctor_name or 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Specialization:</strong></td>
+                                <td><span class="badge bg-info">{{ doctor.specialization or 'N/A' }}</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email:</strong></td>
+                                <td>
+                                    {% if doctor.email %}
+                                        <a href="mailto:{{ doctor.email }}">{{ doctor.email }}</a>
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phone:</strong></td>
+                                <td>
+                                    {% if doctor.phone_number %}
+                                        <a href="tel:{{ doctor.phone_number }}">{{ doctor.phone_number }}</a>
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Professional Information</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Office Location:</strong></td>
+                                <td>{{ doctor.office_location or 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Available Days:</strong></td>
+                                <td>{{ doctor.available_days or 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Available Hours:</strong></td>
+                                <td>{{ doctor.available_hours or 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Doctor ID:</strong></td>
+                                <td><span class="badge bg-secondary">{{ doctor.id }}</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="{{ url_for('admin_edit_doctor', doctor_id=doctor.id) }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Edit Doctor
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+function confirmDelete(message) {
+    return confirm(message);
+}
+</script>
+{% endblock %} 

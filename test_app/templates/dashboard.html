@@ -1,0 +1,231 @@
+{% extends "base_dark.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+    <div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h4 class="mb-0">
+                            <i class="fas fa-tachometer-alt me-2"></i>Welcome, {{ session.get('username', 'Admin') }}
+                        </h4>
+                        <p class="mb-0 text-light">System Overview & Analytics</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-home me-1"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Patients
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-white">{{ stats.patients|default(0) }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-primary"></i>
+            </div>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success h-100">
+                <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Active Doctors
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-white">{{ stats.doctors|default(0) }}</div>
+                        </div>
+                    <div class="col-auto">
+                        <i class="fas fa-stethoscope fa-2x text-success"></i>
+                        </div>
+                        </div>
+                        </div>
+                        </div>
+                        </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info h-100">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Pharmacists
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-white">{{ stats.pharmacists|default(0) }}</div>
+                        </div>
+                    <div class="col-auto">
+                        <i class="fas fa-pills fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning h-100">
+                <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Pending Prescriptions
+                                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-white">{{ stats.pending_prescriptions|default(0) }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-prescription-bottle-alt fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+            <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('patients') }}" class="btn btn-primary w-100">
+                            <i class="fas fa-user-plus me-2"></i>Add Patient
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_add_doctor') }}" class="btn btn-success w-100">
+                            <i class="fas fa-user-md me-2"></i>Add Doctor
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_add_pharmacist') }}" class="btn btn-info w-100">
+                            <i class="fas fa-user-nurse me-2"></i>Add Pharmacist
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_panel') }}" class="btn btn-warning w-100">
+                            <i class="fas fa-cogs me-2"></i>Admin Panel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-dark">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>User</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in recent_activity|default([]) %}
+                            <tr>
+                                <td>{{ activity.action }}</td>
+                                <td>{{ activity.user }}</td>
+                                <td>{{ activity.time }}</td>
+                                <td><span class="badge bg-success">{{ activity.status }}</span></td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No recent activity</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bell me-2"></i>Notifications</h5>
+                </div>
+                <div class="card-body">
+                {% if notifications %}
+                    {% for notification in notifications %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>{{ notification.message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No new notifications</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add some interactive animations
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate statistics cards on load
+    const statCards = document.querySelectorAll('.card');
+    statCards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        }, index * 100);
+    });
+
+    // Add hover effects to quick action buttons
+    const actionButtons = document.querySelectorAll('.btn');
+    actionButtons.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+});
+</script>
+{% endblock %} 

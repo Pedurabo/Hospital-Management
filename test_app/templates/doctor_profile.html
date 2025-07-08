@@ -1,0 +1,538 @@
+{% extends "base_dark.html" %}
+
+{% block title %}My Profile - Doctor Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-user-cog me-2"></i>My Profile
+        </h1>
+        <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'error' else 'info-circle' }} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <!-- Profile Information -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Profile Information</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('doctor_update_profile') }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="doctor_name" class="form-label">Full Name *</label>
+                                    <input type="text" class="form-control" id="doctor_name" name="doctor_name" 
+                                           value="{{ doctor.doctor_name }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="specialization" class="form-label">Specialization *</label>
+                                    <input type="text" class="form-control" id="specialization" name="specialization" 
+                                           value="{{ doctor.specialization }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="phone_number" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                           value="{{ doctor.phone_number or '' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="{{ doctor.email or '' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="office_location" class="form-label">Office Location</label>
+                                    <input type="text" class="form-control" id="office_location" name="office_location" 
+                                           value="{{ doctor.office_location or '' }}" placeholder="e.g., Room 101, Building A">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="username" 
+                                           value="{{ doctor.username }}" readonly>
+                                    <small class="text-muted">Username cannot be changed</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="available_days" class="form-label">Available Days</label>
+                                    <input type="text" class="form-control" id="available_days" name="available_days" 
+                                           value="{{ doctor.available_days or '' }}" 
+                                           placeholder="e.g., Monday, Wednesday, Friday">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="available_hours" class="form-label">Available Hours</label>
+                                    <input type="text" class="form-control" id="available_hours" name="available_hours" 
+                                           value="{{ doctor.available_hours or '' }}" 
+                                           placeholder="e.g., 9:00 AM - 5:00 PM">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Summary -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Profile Summary</h6>
+                </div>
+                <div class="card-body text-center">
+                    <div class="avatar-lg mx-auto mb-3">
+                        <div class="avatar-title bg-primary rounded-circle">
+                            <i class="fas fa-user-md fa-3x text-white"></i>
+                        </div>
+                    </div>
+                    <h4>{{ doctor.doctor_name }}</h4>
+                    <p class="text-muted">{{ doctor.specialization }}</p>
+                    
+                    <hr>
+                    
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h5 class="text-primary">{{ doctor.username }}</h5>
+                            <small class="text-muted">Username</small>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-success">
+                                {% if doctor.is_active %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times-circle text-danger"></i>
+                                {% endif %}
+                            </h5>
+                            <small class="text-muted">Status</small>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="text-start">
+                        <div class="mb-2">
+                            <strong>Account Created:</strong><br>
+                            <small class="text-muted">
+                                {% if doctor.created_at %}
+                                    {{ doctor.created_at.strftime('%Y-%m-%d') if doctor.created_at else 'N/A' }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </small>
+                        </div>
+                        
+                        {% if doctor.last_login %}
+                        <div class="mb-2">
+                            <strong>Last Login:</strong><br>
+                            <small class="text-muted">
+                                {% if doctor.last_login %}
+                                    {{ doctor.last_login.strftime('%Y-%m-%d %H:%M') if doctor.last_login else 'Never' }}
+                                {% else %}
+                                    Never
+                                {% endif %}
+                            </small>
+                        </div>
+                        {% endif %}
+                        
+                        {% if doctor.phone_number %}
+                        <div class="mb-2">
+                            <strong>Phone:</strong><br>
+                            <small class="text-muted">{{ doctor.phone_number }}</small>
+                        </div>
+                        {% endif %}
+                        
+                        {% if doctor.email %}
+                        <div class="mb-2">
+                            <strong>Email:</strong><br>
+                            <small class="text-muted">{{ doctor.email }}</small>
+                        </div>
+                        {% endif %}
+                        
+                        {% if doctor.office_location %}
+                        <div class="mb-2">
+                            <strong>Office:</strong><br>
+                            <small class="text-muted">{{ doctor.office_location }}</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-primary">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                        <a href="{{ url_for('doctor_appointments') }}" class="btn btn-info">
+                            <i class="fas fa-calendar-alt me-1"></i>My Appointments
+                        </a>
+                        <a href="{{ url_for('doctor_patients') }}" class="btn btn-success">
+                            <i class="fas fa-users me-1"></i>My Patients
+                        </a>
+                        <a href="{{ url_for('doctor_logout') }}" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Change -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-key me-1"></i>Change Password
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('doctor_change_password') }}" id="passwordForm">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password *</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password *</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" 
+                                   minlength="6" required>
+                            <div class="form-text">Minimum 6 characters</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm New Password *</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-key me-1"></i>Change Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Account Security -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-shield-alt me-1"></i>Account Security
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-shield-alt me-1"></i>Security Tips</h6>
+                        <ul class="mb-0">
+                            <li>Keep your password secure and don't share it</li>
+                            <li>Use a strong password with letters, numbers, and symbols</li>
+                            <li>Log out when using shared computers</li>
+                            <li>Contact admin if you suspect unauthorized access</li>
+                            <li>Regularly review your profile information</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle me-1"></i>Important Notes</h6>
+                        <ul class="mb-0">
+                            <li>Profile updates are immediately reflected</li>
+                            <li>Contact information is visible to patients</li>
+                            <li>Schedule changes affect appointment availability</li>
+                            <li>Keep your availability information current</li>
+                            <li>Password changes require current password verification</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-lg {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-title {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+}
+
+.form-control:read-only {
+    background-color: #f8f9fc;
+    cursor: not-allowed;
+}
+
+.alert ul {
+    padding-left: 1.2rem;
+}
+
+.alert li {
+    margin-bottom: 0.25rem;
+}
+</style>
+
+<script>
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const profileForm = document.querySelector('form[action*="doctor_update_profile"]');
+    const passwordForm = document.querySelector('#passwordForm');
+    
+    // Profile form validation
+    if (profileForm) {
+        const requiredFields = profileForm.querySelectorAll('[required]');
+        
+        profileForm.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+            }
+        });
+        
+        // Remove validation styling when user starts typing
+        requiredFields.forEach(field => {
+            field.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        });
+    }
+    
+    // Password form validation
+    if (passwordForm) {
+        const currentPassword = document.getElementById('current_password');
+        const newPassword = document.getElementById('new_password');
+        const confirmPassword = document.getElementById('confirm_password');
+        
+        passwordForm.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            // Check if all fields are filled
+            if (!currentPassword.value.trim()) {
+                currentPassword.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                currentPassword.classList.remove('is-invalid');
+            }
+            
+            if (!newPassword.value.trim()) {
+                newPassword.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                newPassword.classList.remove('is-invalid');
+            }
+            
+            if (!confirmPassword.value.trim()) {
+                confirmPassword.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                confirmPassword.classList.remove('is-invalid');
+            }
+            
+            // Check password length
+            if (newPassword.value.length < 6) {
+                newPassword.classList.add('is-invalid');
+                isValid = false;
+            }
+            
+            // Check if passwords match
+            if (newPassword.value !== confirmPassword.value) {
+                confirmPassword.classList.add('is-invalid');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please check your password entries.');
+            }
+        });
+        
+        // Real-time password confirmation check
+        confirmPassword.addEventListener('input', function() {
+            if (this.value !== newPassword.value) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+        
+        // Password strength indicator
+        newPassword.addEventListener('input', function() {
+            const strength = getPasswordStrength(this.value);
+            updatePasswordStrengthIndicator(strength);
+        });
+    }
+    
+    // Auto-save draft for profile form only
+    if (profileForm) {
+        let autoSaveTimer;
+        const formFields = profileForm.querySelectorAll('input, textarea');
+        
+        formFields.forEach(field => {
+            field.addEventListener('input', function() {
+                clearTimeout(autoSaveTimer);
+                autoSaveTimer = setTimeout(() => {
+                    // Save form data to localStorage as draft
+                    const formData = new FormData(profileForm);
+                    const draft = {};
+                    for (let [key, value] of formData.entries()) {
+                        draft[key] = value;
+                    }
+                    localStorage.setItem('doctorProfileDraft', JSON.stringify(draft));
+                }, 2000);
+            });
+        });
+        
+        // Load draft on page load
+        const draft = localStorage.getItem('doctorProfileDraft');
+        if (draft) {
+            const draftData = JSON.parse(draft);
+            Object.keys(draftData).forEach(key => {
+                const field = profileForm.querySelector(`[name="${key}"]`);
+                if (field && !field.value) {
+                    field.value = draftData[key];
+                }
+            });
+        }
+    }
+});
+
+// Password strength checker
+function getPasswordStrength(password) {
+    let strength = 0;
+    
+    if (password.length >= 6) strength++;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+    return strength;
+}
+
+// Update password strength indicator
+function updatePasswordStrengthIndicator(strength) {
+    const newPassword = document.getElementById('new_password');
+    const existingIndicator = document.getElementById('password-strength');
+    
+    if (existingIndicator) {
+        existingIndicator.remove();
+    }
+    
+    const indicator = document.createElement('div');
+    indicator.id = 'password-strength';
+    indicator.className = 'form-text mt-1';
+    
+    let strengthText = '';
+    let strengthClass = '';
+    
+    if (strength <= 2) {
+        strengthText = 'Weak';
+        strengthClass = 'text-danger';
+    } else if (strength <= 4) {
+        strengthText = 'Fair';
+        strengthClass = 'text-warning';
+    } else if (strength <= 5) {
+        strengthText = 'Good';
+        strengthClass = 'text-info';
+    } else {
+        strengthText = 'Strong';
+        strengthClass = 'text-success';
+    }
+    
+    indicator.innerHTML = `<span class="${strengthClass}">Password strength: ${strengthText}</span>`;
+    newPassword.parentNode.appendChild(indicator);
+}
+
+// Show/hide password functionality
+function togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    const icon = document.querySelector(`[onclick="togglePasswordVisibility('${inputId}')"] i`);
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+</script>
+{% endblock %} 

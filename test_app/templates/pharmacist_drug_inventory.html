@@ -1,0 +1,333 @@
+{% extends 'base.html' %}
+{% block title %}Drug Inventory - Pharmacist{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-pills me-2"></i>Drug Inventory
+        </h1>
+        <a href="{{ url_for('pharmacist_dashboard') }}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h4>{{ drugs|length }}</h4>
+                    <p class="mb-0">Total Drugs</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h4>{{ drugs|selectattr('stock_quantity', 'gt', 10)|list|length }}</h4>
+                    <p class="mb-0">In Stock</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <h4>{{ drugs|selectattr('stock_quantity', 'le', 10)|selectattr('stock_quantity', 'gt', 0)|list|length }}</h4>
+                    <p class="mb-0">Low Stock</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                    <h4>{{ drugs|selectattr('stock_quantity', 'equalto', 0)|list|length }}</h4>
+                    <p class="mb-0">Out of Stock</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="fas fa-search"></i> Search & Filter</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="searchInput" class="form-label">Search Drugs</label>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search by name, generic name, or manufacturer...">
+                </div>
+                <div class="col-md-3">
+                    <label for="stockFilter" class="form-label">Stock Status</label>
+                    <select class="form-select" id="stockFilter">
+                        <option value="">All</option>
+                        <option value="in-stock">In Stock</option>
+                        <option value="low-stock">Low Stock</option>
+                        <option value="out-of-stock">Out of Stock</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="typeFilter" class="form-label">Drug Type</label>
+                    <select class="form-select" id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="Tablet">Tablet</option>
+                        <option value="Capsule">Capsule</option>
+                        <option value="Liquid">Liquid</option>
+                        <option value="Injection">Injection</option>
+                        <option value="Cream">Cream</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button class="btn btn-primary d-block w-100" onclick="applyFilters()">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drug Inventory Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Drug Inventory</h5>
+        </div>
+        <div class="card-body">
+            {% if drugs %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="drugsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Drug Name</th>
+                            <th>Generic Name</th>
+                            <th>Type</th>
+                            <th>Strength</th>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for drug in drugs %}
+                        <tr class="drug-row" 
+                            data-name="{{ drug.drug_name|lower }}" 
+                            data-generic="{{ drug.generic_name|lower if drug.generic_name else '' }}"
+                            data-manufacturer="{{ drug.manufacturer|lower if drug.manufacturer else '' }}"
+                            data-type="{{ drug.drug_type }}"
+                            data-stock="{{ drug.stock_quantity }}">
+                            <td>
+                                <strong>{{ drug.drug_name }}</strong>
+                                {% if drug.manufacturer %}
+                                <br><small class="text-muted">{{ drug.manufacturer }}</small>
+                                {% endif %}
+                            </td>
+                            <td>{{ drug.generic_name or 'N/A' }}</td>
+                            <td>{{ drug.drug_type or 'N/A' }}</td>
+                            <td>
+                                {% if drug.strength %}
+                                    {{ drug.strength }} {{ drug.unit or '' }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <span class="me-2">{{ drug.stock_quantity }}</span>
+                                    {% if drug.stock_quantity <= drug.reorder_level %}
+                                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                                    {% endif %}
+                                </div>
+                                {% if drug.reorder_level %}
+                                <small class="text-muted">Reorder: {{ drug.reorder_level }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>${{ "%.2f"|format(drug.price) if drug.price else '0.00' }}</strong>
+                            </td>
+                            <td>
+                                {% if drug.stock_quantity > 10 %}
+                                    <span class="badge bg-success">In Stock</span>
+                                {% elif drug.stock_quantity > 0 %}
+                                    <span class="badge bg-warning text-dark">Low Stock</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Out of Stock</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                            onclick="viewDrugDetails({{ drug.id }})" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-info" 
+                                            onclick="checkExpiry({{ drug.id }})" title="Check Expiry">
+                                        <i class="fas fa-calendar"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle fa-3x mb-3"></i>
+                <h5>No Drugs in Inventory</h5>
+                <p>There are no drugs currently in the inventory.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Drug Details Modal -->
+<div class="modal fade" id="drugDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Drug Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="drugDetailsContent">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Search and filter functionality
+function applyFilters() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const stockFilter = document.getElementById('stockFilter').value;
+    const typeFilter = document.getElementById('typeFilter').value;
+    
+    const rows = document.querySelectorAll('.drug-row');
+    
+    rows.forEach(row => {
+        let show = true;
+        
+        // Search filter
+        if (searchTerm) {
+            const name = row.dataset.name;
+            const generic = row.dataset.generic;
+            const manufacturer = row.dataset.manufacturer;
+            
+            if (!name.includes(searchTerm) && !generic.includes(searchTerm) && !manufacturer.includes(searchTerm)) {
+                show = false;
+            }
+        }
+        
+        // Stock filter
+        if (stockFilter) {
+            const stock = parseInt(row.dataset.stock);
+            if (stockFilter === 'in-stock' && stock <= 10) {
+                show = false;
+            } else if (stockFilter === 'low-stock' && (stock > 10 || stock === 0)) {
+                show = false;
+            } else if (stockFilter === 'out-of-stock' && stock > 0) {
+                show = false;
+            }
+        }
+        
+        // Type filter
+        if (typeFilter && row.dataset.type !== typeFilter) {
+            show = false;
+        }
+        
+        row.style.display = show ? '' : 'none';
+    });
+}
+
+// Real-time search
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('stockFilter').addEventListener('change', applyFilters);
+document.getElementById('typeFilter').addEventListener('change', applyFilters);
+
+function viewDrugDetails(drugId) {
+    // Show loading
+    document.getElementById('drugDetailsContent').innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading drug details...</p>
+        </div>
+    `;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('drugDetailsModal'));
+    modal.show();
+    
+    // Load drug details (this would need an API endpoint)
+    // For now, we'll show a placeholder
+    setTimeout(() => {
+        document.getElementById('drugDetailsContent').innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                Drug details for ID #${drugId} would be loaded here.
+                <br><br>
+                This would include:
+                <ul>
+                    <li>Complete drug information</li>
+                    <li>Stock history</li>
+                    <li>Expiry dates</li>
+                    <li>Usage statistics</li>
+                    <li>Related prescriptions</li>
+                </ul>
+            </div>
+        `;
+    }, 1000);
+}
+
+function checkExpiry(drugId) {
+    // This would check expiry dates for the drug
+    alert(`Checking expiry dates for drug ID #${drugId}`);
+    // In a real implementation, this would show expiry information
+}
+
+// Add some interactivity to the table
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects
+    const tableRows = document.querySelectorAll('tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#f8f9fa';
+        });
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+    
+    // Add click to highlight low stock items
+    const lowStockRows = document.querySelectorAll('.drug-row');
+    lowStockRows.forEach(row => {
+        const stock = parseInt(row.dataset.stock);
+        if (stock <= 10 && stock > 0) {
+            row.style.borderLeft = '4px solid #ffc107';
+        } else if (stock === 0) {
+            row.style.borderLeft = '4px solid #dc3545';
+        }
+    });
+});
+</script>
+{% endblock %} 

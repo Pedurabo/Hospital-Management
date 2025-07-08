@@ -1,0 +1,334 @@
+{% extends "base_dark.html" %}
+
+{% block title %}Patient Management - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <h1><i class="fas fa-user-injured"></i> Patient Management</h1>
+    <p>Manage and track patient records in the healthcare system</p>
+</div>
+
+<div class="content-body">
+    <!-- Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #059669, #047857);">
+                <div class="number">{{ patients|length }}</div>
+                <div class="label">Total Patients</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #0891b2, #0e7490);">
+                <div class="number">{{ patients|selectattr('sex', 'equalto', 'Male')|list|length }}</div>
+                <div class="label">Male Patients</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #d97706, #b45309);">
+                <div class="number">{{ patients|selectattr('sex', 'equalto', 'Female')|list|length }}</div>
+                <div class="label">Female Patients</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">
+                <div class="number">{{ patients|rejectattr('sex', 'equalto', 'Male')|rejectattr('sex', 'equalto', 'Female')|list|length }}</div>
+                <div class="label">Other</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Patient Records</h5>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm me-2">
+                        <i class="fas fa-home me-1"></i>Back to Home
+                    </a>
+                    <a href="{{ url_for('add_patient') }}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add New Patient
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search patients by name, email, or phone...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="sexFilter">
+                        <option value="">All Sex</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="ageFilter">
+                        <option value="">All Ages</option>
+                        <option value="0-18">0-18</option>
+                        <option value="19-30">19-30</option>
+                        <option value="31-50">31-50</option>
+                        <option value="51+">51+</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patients Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-user-injured"></i> Patient Records</h5>
+            <span class="badge bg-primary">{{ patients|length }} patients</span>
+        </div>
+        <div class="card-body">
+            {% if patients %}
+            <div class="table-responsive">
+                <table class="table table-hover" id="patientsTable">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-user"></i> Name</th>
+                            <th><i class="fas fa-birthday-cake"></i> Age</th>
+                            <th><i class="fas fa-venus-mars"></i> Sex</th>
+                            <th><i class="fas fa-envelope"></i> Email</th>
+                            <th><i class="fas fa-phone"></i> Phone</th>
+                            <th><i class="fas fa-map-marker-alt"></i> Address</th>
+                            <th><i class="fas fa-calendar"></i> Registered</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr class="patient-row" 
+                            data-name="{{ patient.patient_name.lower() }}" 
+                            data-email="{{ (patient.email or '')|lower }}" 
+                            data-phone="{{ (patient.phone_number or '')|lower }}"
+                            data-sex="{{ patient.sex }}"
+                            data-age="{{ patient.age }}">
+                            <td><span class="badge bg-secondary">{{ patient.id }}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-2" style="width: 30px; height: 30px; font-size: 0.8rem;">
+                                        {{ patient.patient_name[0].upper() }}
+                                    </div>
+                                    <div>
+                                        <strong>{{ patient.patient_name }}</strong>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ patient.age }}</span>
+                            </td>
+                            <td>
+                                {% if patient.sex == 'Male' %}
+                                    <span class="badge bg-primary"><i class="fas fa-mars"></i> Male</span>
+                                {% elif patient.sex == 'Female' %}
+                                    <span class="badge bg-warning"><i class="fas fa-venus"></i> Female</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ patient.sex }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if patient.email %}
+                                    <a href="mailto:{{ patient.email }}" class="text-decoration-none">
+                                        <i class="fas fa-envelope"></i> {{ patient.email }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if patient.phone_number %}
+                                    <a href="tel:{{ patient.phone_number }}" class="text-decoration-none">
+                                        <i class="fas fa-phone"></i> {{ patient.phone_number }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if patient.address %}
+                                    <span class="text-truncate d-inline-block" style="max-width: 150px;" 
+                                          data-bs-toggle="tooltip" title="{{ patient.address }}">
+                                        {{ patient.address }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if patient.created_at %}
+                                    {% if patient.created_at is string %}
+                                        {{ patient.created_at }}
+                                    {% else %}
+                                        {{ patient.created_at.strftime('%Y-%m-%d') }}
+                                    {% endif %}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" 
+                                       class="btn btn-sm btn-outline-primary" 
+                                       data-bs-toggle="tooltip" 
+                                       title="Edit Patient">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('delete_patient_route', patient_id=patient.id) }}" 
+                                          style="display: inline;"
+                                          onsubmit="return confirmDelete('Are you sure you want to delete patient \"{{ patient.patient_name }}\"?')">
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-outline-danger" 
+                                                data-bs-toggle="tooltip" 
+                                                title="Delete Patient">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-user-injured fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">No patients found</h5>
+                <p class="text-muted">Start by adding your first patient record.</p>
+                <a href="{{ url_for('add_patient') }}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Add First Patient
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Features Info -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Patient Management Features</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-plus text-success"></i>
+                            Add new patients with complete information
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-edit text-primary"></i>
+                            Edit patient details including contact info
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-trash text-danger"></i>
+                            Delete patient records when needed
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-search text-info"></i>
+                            Search and filter patient records
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-shield-alt"></i> Data Security</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-database text-primary"></i>
+                            All data securely stored in SQL Server
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-user-shield text-success"></i>
+                            Role-based access control
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-history text-warning"></i>
+                            Complete audit trail of changes
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-backup text-info"></i>
+                            Regular database backups
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Search and filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const sexFilter = document.getElementById('sexFilter');
+    const ageFilter = document.getElementById('ageFilter');
+    const patientRows = document.querySelectorAll('.patient-row');
+
+    function filterPatients() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const sexValue = sexFilter.value;
+        const ageValue = ageFilter.value;
+
+        patientRows.forEach(row => {
+            const name = row.dataset.name;
+            const email = row.dataset.email;
+            const phone = row.dataset.phone;
+            const sex = row.dataset.sex;
+            const age = parseInt(row.dataset.age);
+
+            let showRow = true;
+
+            // Search filter
+            if (searchTerm && !name.includes(searchTerm) && !email.includes(searchTerm) && !phone.includes(searchTerm)) {
+                showRow = false;
+            }
+
+            // Sex filter
+            if (sexValue && sex !== sexValue) {
+                showRow = false;
+            }
+
+            // Age filter
+            if (ageValue) {
+                const [min, max] = ageValue.split('-').map(Number);
+                if (ageValue === '51+') {
+                    if (age < 51) showRow = false;
+                } else if (age < min || age > max) {
+                    showRow = false;
+                }
+            }
+
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterPatients);
+    sexFilter.addEventListener('change', filterPatients);
+    ageFilter.addEventListener('change', filterPatients);
+});
+</script>
+{% endblock %} 
