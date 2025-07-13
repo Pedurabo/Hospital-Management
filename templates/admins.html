@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Manage Admins - Waldolf Colleges & Universities{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card mt-5">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Manage Admins</h4>
+      </div>
+      <div class="card-body">
+        <form method="post" class="row g-3 mb-4">
+          <div class="col-md-3">
+            <input name="username" class="form-control" placeholder="Username" required>
+          </div>
+          <div class="col-md-3">
+            <input name="password" type="password" class="form-control" placeholder="Password" required>
+          </div>
+          <div class="col-md-3">
+            <input name="email" class="form-control" placeholder="Email" required>
+          </div>
+          <div class="col-md-2 d-flex align-items-center">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="is_super" id="is_super">
+              <label class="form-check-label" for="is_super">Super Admin</label>
+            </div>
+          </div>
+          <div class="col-md-1">
+            <button type="submit" class="btn btn-success w-100">Add</button>
+          </div>
+        </form>
+        <table class="table table-bordered table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for admin in admins %}
+            <tr>
+              <td>{{ admin.username }}</td>
+              <td>{{ admin.email }}</td>
+              <td>{% if admin.is_super %}<span class="badge bg-success">Super Admin</span>{% else %}Admin{% endif %}</td>
+              <td>
+                <a href="{{ url_for('edit_admin', admin_id=admin.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                {% if current_user.id != admin.id %}
+                <form method="post" action="{{ url_for('delete_admin', admin_id=admin.id) }}" style="display:inline-block;" onsubmit="return confirm('Delete this admin?');">
+                  <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 
