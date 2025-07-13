@@ -153,4 +153,4 @@ For support and questions, please open an issue in the GitHub repository.
 
 ---
 
-**Note**: This is a development project. For production use in healthcare environments, ensure compliance with relevant healthcare regulations and data protection laws. 
+**Note**: This is a development project. For production use in healthcare environments, ensure compliance with relevant healthcare regulations and data protection laws.
